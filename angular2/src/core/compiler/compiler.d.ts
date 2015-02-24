@@ -6,7 +6,7 @@ import { CompileElement } from './pipeline/compile_element';
 import { TemplateLoader } from './template_loader';
 import { TemplateResolver } from './template_resolver';
 import { DirectiveMetadata } from './directive_metadata';
-import { TemplateAnnotation } from '../annotations/template';
+import { Template } from '../annotations/template';
 import { ShadowDomStrategy } from './shadow_dom_strategy';
 import { CompileStep } from './pipeline/compile_step';
 /**
@@ -36,11 +36,11 @@ export declare class Compiler {
     _shadowDomDirectives: List<DirectiveMetadata>;
     _templateResolver: TemplateResolver;
     constructor(changeDetection: ChangeDetection, templateLoader: TemplateLoader, reader: DirectiveMetadataReader, parser: Parser, cache: CompilerCache, shadowDomStrategy: ShadowDomStrategy, templateResolver: TemplateResolver);
-    createSteps(component: Type, template: TemplateAnnotation): List<CompileStep>;
+    createSteps(component: Type, template: Template): List<CompileStep>;
     compile(component: Type): Promise<ProtoView>;
     _compile(component: Type): any;
-    _compileTemplate(template: TemplateAnnotation, tplElement: Element, component: Type): any;
+    _compileTemplate(template: Template, tplElement: Element, component: Type): any;
     _compileNestedProtoView(ce: CompileElement, promises: List<Promise<any>>): void;
-    _flattenDirectives(template: TemplateAnnotation): List<Type>;
+    _flattenDirectives(template: Template): List<Type>;
     _flattenList(tree: List<any>, out: List<Type>): void;
 }

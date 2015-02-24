@@ -3,7 +3,7 @@ import { View } from 'angular2/src/core/compiler/view';
 import { LightDom } from 'angular2/src/core/compiler/shadow_dom_emulation/light_dom';
 import { ViewContainer } from 'angular2/src/core/compiler/view_container';
 import { NgElement } from 'angular2/src/core/dom/element';
-import { DirectiveAnnotation } from 'angular2/src/core/annotations/annotations';
+import { Directive } from 'angular2/src/core/annotations/annotations';
 import { BindingPropagationConfig } from 'angular2/src/core/compiler/binding_propagation_config';
 export declare class TreeNode {
     _parent: TreeNode;
@@ -30,9 +30,9 @@ export declare class DirectiveBinding extends Binding {
     callOnDestroy: boolean;
     callOnChange: boolean;
     onCheck: boolean;
-    constructor(key: Key, factory: Function, dependencies: List<any>, providedAsPromise: boolean, annotation: DirectiveAnnotation);
-    static createFromBinding(b: Binding, annotation: DirectiveAnnotation): DirectiveBinding;
-    static createFromType(type: Type, annotation: DirectiveAnnotation): DirectiveBinding;
+    constructor(key: Key, factory: Function, dependencies: List<any>, providedAsPromise: boolean, annotation: Directive);
+    static createFromBinding(b: Binding, annotation: Directive): DirectiveBinding;
+    static createFromType(type: Type, annotation: Directive): DirectiveBinding;
     static _hasEventEmitter(eventName: string, binding: DirectiveBinding): boolean;
 }
 export declare class PreBuiltObjects {

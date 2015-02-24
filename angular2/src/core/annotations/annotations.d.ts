@@ -1,4 +1,4 @@
-export declare class DirectiveAnnotation {
+export declare class Directive {
     selector: any;
     bind: any;
     lightDomServices: any;
@@ -7,23 +7,19 @@ export declare class DirectiveAnnotation {
     constructor(_0?: any);
     hasLifecycleHook(hook: string): boolean;
 }
-export declare function Directive(arg?: any): (c: any) => any;
-export declare class ComponentAnnotation extends DirectiveAnnotation {
+export declare class Component extends Directive {
     lightDomServices: any;
     shadowDomServices: any;
     componentServices: any;
     lifecycle: any;
     constructor(_0?: any);
 }
-export declare function Component(arg?: any): (c: any) => any;
-export declare class DecoratorAnnotation extends DirectiveAnnotation {
+export declare class Decorator extends Directive {
     compileChildren: boolean;
     constructor(_0?: any);
 }
-export declare function Decorator(arg?: any): (c: any) => any;
-export declare class ViewportAnnotation extends DirectiveAnnotation {
+export declare class Viewport extends Directive {
     constructor(_0?: any);
 }
-export declare function Viewport(arg?: any): (c: any) => any;
 export declare const onDestroy: string;
 export declare const onChange: string;

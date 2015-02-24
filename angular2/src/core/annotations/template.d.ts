@@ -1,4 +1,4 @@
-export declare class TemplateAnnotation {
+export declare class Template {
     url: any;
     inline: any;
     directives: any;
@@ -8,4 +8,3 @@ export declare class TemplateAnnotation {
     device: any;
     constructor(_0: any);
 }
-export declare function Template(arg: any): (c: any) => any;
