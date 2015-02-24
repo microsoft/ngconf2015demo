@@ -1,0 +1,17 @@
+<!doctype html>
+<html>
+  <title>Sourcemaps</title>
+<body>
+  Please look into the console and check whether the stack trace is mapped
+  via source maps!
+  <script src="/deps/traceur-runtime.js" type="text/javascript"></script>
+<script src="/rtts_assert/rtts_assert.js" type="text/javascript"></script>
+<script src="/deps/es6-module-loader-sans-promises.src.js" type="text/javascript"></script>
+<script src="/deps/zone.js" type="text/javascript"></script>
+<script src="/deps/long-stack-trace-zone.js" type="text/javascript"></script>
+<script src="/deps/system.src.js" type="text/javascript"></script>
+<script src="/deps/extension-register.js" type="text/javascript"></script>
+<script src="/deps/runtime_paths.js" type="text/javascript"></script>
+<script type="text/javascript">System.import('examples/src/sourcemap/index').then(function(m) { m.main(); }, console.log.bind(console))</script>
+</body>
+</html>
