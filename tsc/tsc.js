@@ -4022,6 +4022,18 @@ var ts;
         }
     }
     ts.createDiagnosticCollection = createDiagnosticCollection;
+    function findMetadata(metadataArray, decoratorSymbol) {
+        if (metadataArray && decoratorSymbol) {
+            for (var i = 0; i < metadataArray.length; i++) {
+                var metadata = metadataArray[i];
+                if (metadata.symbol === decoratorSymbol) {
+                    return metadata;
+                }
+            }
+        }
+        return undefined;
+    }
+    ts.findMetadata = findMetadata;
 })(ts || (ts = {}));
 var ts;
 (function (ts) {
@@ -8151,9 +8163,9 @@ var ts;
         var unknownSymbol = createSymbol(4 | 67108864, "unknown");
         var resolvingSymbol = createSymbol(67108864, "__resolving__");
         var anyType = createIntrinsicType(1, "any");
-        var stringType = createIntrinsicType(2, "string", "String");
-        var numberType = createIntrinsicType(4, "number", "Number");
-        var booleanType = createIntrinsicType(8, "boolean", "Boolean");
+        var stringType = createIntrinsicType(2, "string");
+        var numberType = createIntrinsicType(4, "number");
+        var booleanType = createIntrinsicType(8, "boolean");
         var esSymbolType = createIntrinsicType(1048576, "symbol");
         var voidType = createIntrinsicType(16, "void");
         var undefinedType = createIntrinsicType(32 | 262144, "undefined");
@@ -8827,10 +8839,9 @@ var ts;
             result.id = typeCount++;
             return result;
         }
-        function createIntrinsicType(kind, intrinsicName, boxedName) {
+        function createIntrinsicType(kind, intrinsicName) {
             var type = createType(kind);
             type.intrinsicName = intrinsicName;
-            type.boxedName = boxedName;
             return type;
         }
         function createObjectType(kind, symbol) {
@@ -13530,7 +13541,7 @@ var ts;
         function checkConditionallyRemovedExpression(node, symbol) {
             if (symbol) {
                 var metadataArray = getMetadataForSymbol(symbol);
-                var metadata = findMetadata(metadataArray, globalConditionalDecoratorSymbol);
+                var metadata = ts.findMetadata(metadataArray, globalConditionalDecoratorSymbol);
                 if (metadata && metadata.arguments.length > 0) {
                     var conditionSymbol = metadata.arguments[0];
                     if (conditionSymbol && !isConditionalSymbolDefined(conditionSymbol)) {
@@ -13542,7 +13553,7 @@ var ts;
         function checkUsageOfObsoleteSymbol(node, symbol) {
             if (symbol) {
                 var metadataArray = getMetadataForSymbol(symbol);
-                var metadata = findMetadata(metadataArray, globalObsoleteDecoratorSymbol);
+                var metadata = ts.findMetadata(metadataArray, globalObsoleteDecoratorSymbol);
                 if (metadata) {
                     if (metadata.arguments.length > 0) {
                         error(node, ts.Diagnostics._0_is_obsolete_Colon_1, symbolToString(symbol), metadata.arguments[0]);
@@ -14804,6 +14815,9 @@ var ts;
                     result[i] = value;
                 }
             }
+            if (!result) {
+                return emptyArray;
+            }
             return result;
         }
         function reportInvalidDecoratorExpression(node, exprType) {
@@ -14830,7 +14844,7 @@ var ts;
                 return true;
             }
             var metadataArray = getMetadataForSymbol(decoratorSymbol);
-            var metadata = findMetadata(metadataArray, globalDecoratorSymbol);
+            var metadata = ts.findMetadata(metadataArray, globalDecoratorSymbol);
             if (metadata && metadata.arguments.length > 0) {
                 var usage = metadata.arguments[0];
                 return usage && usage.ambient;
@@ -14848,17 +14862,6 @@ var ts;
                     return true;
             }
             return false;
-        }
-        function findMetadata(metadataArray, decoratorSymbol) {
-            if (metadataArray) {
-                for (var i = 0; i < metadataArray.length; i++) {
-                    var metadata = metadataArray[i];
-                    if (metadata.symbol === decoratorSymbol) {
-                        return metadata;
-                    }
-                }
-            }
-            return undefined;
         }
         function resolveMetadataForDecorator(decorator) {
             var name = getIdentifierOfDecoratorExpression(decorator.expression);
@@ -14945,7 +14948,7 @@ var ts;
             var flags;
             if (decoratorSymbol) {
                 var metadataArray = getMetadataForSymbol(decoratorSymbol);
-                var metadata = findMetadata(metadataArray, globalDecoratorSymbol);
+                var metadata = ts.findMetadata(metadataArray, globalDecoratorSymbol);
                 if (metadata && metadata.arguments.length > 0) {
                     var usage = metadata.arguments[0];
                     if (usage) {
@@ -14981,6 +14984,52 @@ var ts;
                 }
             }
             return flags;
+        }
+        function checkTypeAnnotationAsExpression(node) {
+            var typeNode;
+            if (isAccessor(node.kind)) {
+                typeNode = node.type;
+            }
+            else if (node.kind === 132) {
+                typeNode = node.type;
+            }
+            if (typeNode && typeNode.kind === 141) {
+                var type = getTypeOfSymbol(node.symbol);
+                if (type.symbol.valueDeclaration) {
+                    checkExpressionOrQualifiedName(typeNode.typeName);
+                }
+            }
+        }
+        function checkParameterTypeAnnotationsAsExpressions(node) {
+            var declaration;
+            if (node.kind === 198) {
+                declaration = ts.getFirstConstructorWithBody(node);
+            }
+            else {
+                declaration = node;
+            }
+            if (declaration) {
+                var parameters = declaration.parameters;
+                var parameterCount = parameters.length;
+                for (var i = 0; i < parameterCount; i++) {
+                    var parameter = parameters[i];
+                    if (parameter.type && parameter.type.kind === 141) {
+                        var parameterType = getTypeOfSymbol(parameter.symbol);
+                        if (parameterType.symbol.valueDeclaration) {
+                            checkExpressionOrQualifiedName(parameter.type.typeName);
+                        }
+                    }
+                }
+            }
+        }
+        function checkReturnTypeAnnotationAsExpression(node) {
+            var returnTypeNode = node.type;
+            if (returnTypeNode && returnTypeNode.kind === 141) {
+                var returnTypeSymbol = getSymbolOfNode(returnTypeNode);
+                if (returnTypeSymbol.valueDeclaration) {
+                    checkExpressionOrQualifiedName(returnTypeNode.typeName);
+                }
+            }
         }
         function checkDecorator(node) {
             var expression = node.expression;
@@ -15039,6 +15088,39 @@ var ts;
                     case globalReturnTypeDecoratorSymbol:
                         getNodeLinks(node.parent).flags |= 4096;
                         break;
+                }
+            }
+            else if (symbol && !(flags & 131072)) {
+                var valueDeclaration = symbol.valueDeclaration;
+                if (valueDeclaration && ts.isAnyFunction(valueDeclaration)) {
+                    var hasTypeDecorator = false;
+                    var hasParamTypesDecorator = false;
+                    var hasReturnTypeDecorator = false;
+                    var signature = getSignatureFromDeclaration(valueDeclaration);
+                    var parameters = signature.parameters;
+                    var parameterCount = parameters.length;
+                    for (var i = 0; i < parameterCount; i++) {
+                        var parameter = parameters[i];
+                        var metadataArray = getMetadataForSymbol(parameter);
+                        if (ts.findMetadata(metadataArray, globalTypeDecoratorSymbol)) {
+                            hasTypeDecorator = true;
+                        }
+                        if (ts.findMetadata(metadataArray, globalParamTypesDecoratorSymbol)) {
+                            hasParamTypesDecorator = true;
+                        }
+                        if (ts.findMetadata(metadataArray, globalReturnTypeDecoratorSymbol)) {
+                            hasReturnTypeDecorator = true;
+                        }
+                    }
+                    if (hasTypeDecorator && (isAccessor(node.parent.kind) || node.kind === 132)) {
+                        checkTypeAnnotationAsExpression(node.parent);
+                    }
+                    if (hasParamTypesDecorator && (node.parent.kind === 198 || ts.isAnyFunction(node.parent))) {
+                        checkParameterTypeAnnotationsAsExpressions(node.parent);
+                    }
+                    if (hasReturnTypeDecorator && ts.isAnyFunction(node.parent)) {
+                        checkReturnTypeAnnotationAsExpression(node.parent);
+                    }
                 }
             }
         }
@@ -16975,39 +17057,35 @@ var ts;
             }
             return undefined;
         }
-        function serializeType(type) {
+        function serializeEntityName(node) {
+            if (node.kind === 65) {
+                var substitution = getExpressionNameSubstitution(node);
+                return substitution || node.text;
+            }
+            else {
+                return serializeEntityName(node.left) + "." + serializeEntityName(node.right);
+            }
+        }
+        function serializeTypeReferenceNode(node) {
+            var type = getTypeFromTypeReferenceNode(node);
             var flags = type.flags;
             if (flags & 16) {
                 return "void 0";
             }
-            else if (flags & 1048703) {
-                var boxedName = type.boxedName;
-                if (boxedName) {
-                    return boxedName;
-                }
+            else if (type.flags & 8) {
+                return "Boolean";
             }
-            else if (flags & 256) {
-                return "String";
-            }
-            else if (flags & 128) {
+            else if (flags & 132) {
                 return "Number";
+            }
+            else if (flags & 258) {
+                return "String";
             }
             else if (flags & 8192) {
                 return "Array";
             }
-            else {
-                var symbol = type.symbol;
-                var declaration = symbol.valueDeclaration;
-                if (declaration) {
-                    var name = declaration.name;
-                    if (name && name.kind === 65) {
-                        var prefix = getExpressionNameSubstitution(name);
-                        if (prefix) {
-                            return prefix + "." + name.text;
-                        }
-                        return name.text;
-                    }
-                }
+            else if (type.symbol.valueDeclaration) {
+                return serializeEntityName(node.typeName);
             }
             var signatures = getSignaturesOfType(type, 0);
             if (signatures.length) {
@@ -17015,10 +17093,53 @@ var ts;
             }
             return "Object";
         }
+        function serializeTypeNode(node) {
+            if (node) {
+                switch (node.kind) {
+                    case 99:
+                        return "void 0";
+                    case 149:
+                        return serializeTypeNode(node.type);
+                    case 65:
+                    case 126:
+                        return serializeEntityName(node);
+                    case 142:
+                    case 143:
+                        return "Function";
+                    case 146:
+                    case 147:
+                        return "Array";
+                    case 114:
+                        return "Boolean";
+                    case 122:
+                    case 8:
+                        return "String";
+                    case 120:
+                        return "Number";
+                    case 141:
+                        return serializeTypeReferenceNode(node);
+                    case 144:
+                    case 145:
+                    case 148:
+                    case 113:
+                    default:
+                        break;
+                }
+            }
+            return "Object";
+        }
         function serializeTypeOfDeclaration(node) {
-            var symbol = getSymbolOfNode(node);
-            var type = symbol ? getTypeOfSymbol(symbol) : unknownType;
-            return serializeType(type);
+            switch (node.kind) {
+                case 198:
+                    return serializeEntityName(node.name);
+                case 132:
+                case 129:
+                    return serializeTypeNode(node.type);
+            }
+            if (ts.isAnyFunction(node)) {
+                return "Function";
+            }
+            return "Object";
         }
         function serializeParameterTypesOfDeclaration(node) {
             var valueDeclaration;
@@ -17047,9 +17168,8 @@ var ts;
             if (node.kind === 198) {
                 return serializeTypeOfDeclaration(node);
             }
-            else if (ts.isAnyFunction(node) && ts.nodeIsPresent(node.body)) {
-                var returnType = getReturnTypeOfSignature(getSignatureFromDeclaration(valueDeclaration));
-                return serializeType(returnType);
+            else if (ts.isAnyFunction(node)) {
+                return serializeTypeNode(node.type);
             }
             return "void 0";
         }
@@ -20307,6 +20427,9 @@ var ts;
                 }
             }
             function emitExpressionStatement(node) {
+                if (resolver.getNodeCheckFlags(node.expression) & 16384) {
+                    return;
+                }
                 emitParenthesized(node.expression, node.expression.kind === 163);
                 write(";");
             }
