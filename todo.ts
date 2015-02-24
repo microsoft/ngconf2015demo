@@ -1,10 +1,26 @@
 /// <reference path='globals.d.ts'/>
-/// <reference path='annotations.ts'/>
 /// <reference path='firebase/firebase.d.ts'/>
 
 import {Component, Template, bootstrap, Foreach} from 'angular2/angular2';
 import {bind} from 'angular2/di';
-import {AngularFire, AngularFireArray} from 'firebase/AngularFire';
+import {AngularFire, FirebaseArray} from 'firebase/AngularFire';
+
+function addAnnotation(c: any, annotation: any): any {
+    (c.annotations || (c.annotations = [])).push(annotation);
+    return c;
+}
+
+function TSComponent(arg: any, @paramtypes parameters?: any[]) {
+    return (c) => {
+        c.parameters = parameters.map(p => [p]);
+        addAnnotation(c, new Component(arg))
+        return
+    }
+}
+
+function TSTemplate(arg: any) {
+    return c => addAnnotation(c, new Template(arg));
+}
 
 @TSComponent({
   selector: 'todo-app',
@@ -17,7 +33,7 @@ import {AngularFire, AngularFireArray} from 'firebase/AngularFire';
   directives: [Foreach]
 })
 class TodoApp {
-  todoService: AngularFireArray;
+  todoService: FirebaseArray;
   todoEdit: any;
 
   constructor(sync: AngularFire) {
