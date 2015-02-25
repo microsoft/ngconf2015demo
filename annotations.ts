@@ -1,16 +1,18 @@
+import {Component as ComponentAnnotation, Template as TemplateAnnotation} from 'angular2/angular2';
+
 function addAnnotation(c: any, annotation: any): any {
     (c.annotations || (c.annotations = [])).push(annotation);
     return c;
 }
 
-function TSComponent(arg: any, @paramtypes parameters?: any[]) {
+export function Component(arg: { selector: string, componentServices: any[] }, @paramtypes parameters?: any[]) {
     return (c) => {
-        c.parameters = [[AngularFire]];
-        addAnnotation(c, new Component(arg))
+        c.parameters = parameters.map(p => [p]);
+        addAnnotation(c, new ComponentAnnotation(arg))
         return
     }
 }
 
-function TSTemplate(arg: any) {
-    return c => addAnnotation(c, new Template(arg));
+export function Template(arg: { url: string, directives: any[] }) {
+    return c => addAnnotation(c, new TemplateAnnotation(arg));
 }

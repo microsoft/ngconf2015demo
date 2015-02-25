@@ -1,34 +1,17 @@
-/// <reference path='globals.d.ts'/>
 /// <reference path='firebase/firebase.d.ts'/>
 
-import {Component, Template, bootstrap, Foreach} from 'angular2/angular2';
+import {Component, Template} from 'annotations';
+import {bootstrap, Foreach} from 'angular2/angular2';
 import {bind} from 'angular2/di';
 import {AngularFire, FirebaseArray} from 'firebase/AngularFire';
 
-function addAnnotation(c: any, annotation: any): any {
-    (c.annotations || (c.annotations = [])).push(annotation);
-    return c;
-}
-
-function TSComponent(arg: any, @paramtypes parameters?: any[]) {
-    return (c) => {
-        c.parameters = parameters.map(p => [p]);
-        addAnnotation(c, new Component(arg))
-        return
-    }
-}
-
-function TSTemplate(arg: any) {
-    return c => addAnnotation(c, new Template(arg));
-}
-
-@TSComponent({
+@Component({
   selector: 'todo-app',
   componentServices: [
     AngularFire,
     bind(Firebase).toValue(new Firebase('https://webapi.firebaseio-demo.com/test'))
 ]})
-@TSTemplate({
+@Template({
   url: '/todo.html',
   directives: [Foreach]
 })

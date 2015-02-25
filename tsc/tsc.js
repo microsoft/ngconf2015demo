@@ -1631,15 +1631,17 @@ var ts;
         External_module_0_has_no_default_export_or_export_assignment: { code: 1192, category: 1, key: "External module '{0}' has no default export or export assignment." },
         An_export_declaration_cannot_have_modifiers: { code: 1193, category: 1, key: "An export declaration cannot have modifiers." },
         Export_declarations_are_not_permitted_in_an_internal_module: { code: 1194, category: 1, key: "Export declarations are not permitted in an internal module." },
-        Decorators_are_only_supported_on_class_members_when_targeting_ECMAScript_5_or_higher: { code: 1195, category: 1, key: "Decorators are only supported on class members when targeting ECMAScript 5 or higher." },
-        _0_is_obsolete: { code: 1196, category: 1, key: "'{0}' is obsolete." },
-        _0_is_obsolete_Colon_1: { code: 1197, category: 1, key: "'{0}' is obsolete: '{1}'" },
-        Decorators_cannot_appear_here: { code: 1198, category: 1, key: "Decorators cannot appear here." },
-        Non_ambient_decorators_are_only_supported_on_class_members_when_targeting_ECMAScript_5_or_higher: { code: 1199, category: 1, key: "Non-ambient decorators are only supported on class members when targeting ECMAScript 5 or higher." },
-        Decorator_0_is_not_valid_on_this_declaration_type_It_is_only_valid_on_1_declarations: { code: 1198, category: 1, key: "Decorator '{0}' is not valid on this declaration type. It is only valid on '{1}' declarations." },
-        Decorator_0_is_not_valid_on_this_declaration_type: { code: 1199, category: 1, key: "Decorator '{0}' is not valid on this declaration type." },
-        Decorator_is_not_valid_on_this_declaration_type: { code: 1200, category: 1, key: "Decorator is not valid on this declaration type." },
-        Argument_to_ambient_decorator_must_be_constant_expression: { code: 1201, category: 1, key: "Argument to ambient decorator must be constant expression." },
+        Decorators_cannot_appear_here: { code: 1195, category: 1, key: "Decorators cannot appear here." },
+        Non_ambient_decorators_are_only_supported_on_class_members_when_targeting_ECMAScript_5_or_higher: { code: 1196, category: 1, key: "Non-ambient decorators are only supported on class members when targeting ECMAScript 5 or higher." },
+        Decorator_0_is_not_valid_on_this_declaration_type_It_is_only_valid_on_1_declarations: { code: 1197, category: 1, key: "Decorator '{0}' is not valid on this declaration type. It is only valid on '{1}' declarations." },
+        Decorator_is_not_valid_on_this_declaration_type: { code: 1199, category: 1, key: "Decorator is not valid on this declaration type." },
+        Argument_to_ambient_decorator_must_be_constant_expression: { code: 1200, category: 1, key: "Argument to ambient decorator must be constant expression." },
+        _0_decorator_cannot_be_used_when_1_is_already_specified: { code: 1201, category: 1, key: "'{0}' decorator cannot be used when '{1}' is already specified." },
+        _0_decorator_already_specified: { code: 1202, category: 1, key: "'{0}' decorator already specified." },
+        Decorators_may_not_change_the_type_of_a_member: { code: 1203, category: 1, key: "Decorators may not change the type of a member." },
+        Decorators_may_not_change_the_type_of_a_class: { code: 1204, category: 1, key: "Decorators may not change the type of a class." },
+        _0_is_obsolete: { code: 1205, category: 1, key: "'{0}' is obsolete." },
+        _0_is_obsolete_Colon_1: { code: 1206, category: 1, key: "'{0}' is obsolete: '{1}'" },
         Duplicate_identifier_0: { code: 2300, category: 1, key: "Duplicate identifier '{0}'." },
         Initializer_of_instance_member_variable_0_cannot_reference_identifier_1_declared_in_the_constructor: { code: 2301, category: 1, key: "Initializer of instance member variable '{0}' cannot reference identifier '{1}' declared in the constructor." },
         Static_members_cannot_reference_class_type_parameters: { code: 2302, category: 1, key: "Static members cannot reference class type parameters." },
@@ -4327,7 +4329,8 @@ var ts;
                     visitNode(cbNode, node.name) ||
                     visitNode(cbNode, node.body);
             case 204:
-                return visitNodes(cbNodes, node.modifiers) ||
+                return visitNodes(cbNodes, node.decorators) ||
+                    visitNodes(cbNodes, node.modifiers) ||
                     visitNode(cbNode, node.name) ||
                     visitNode(cbNode, node.moduleReference);
             case 205:
@@ -5977,15 +5980,17 @@ var ts;
         }
         function parseExpression() {
             var saveDecoratorContext = inDecoratorContext();
-            if (saveDecoratorContext)
+            if (saveDecoratorContext) {
                 setDecoratorContext(false);
+            }
             var expr = parseAssignmentExpressionOrHigher();
             var operatorToken;
             while ((operatorToken = parseOptionalToken(23))) {
                 expr = makeBinaryExpression(expr, operatorToken, parseAssignmentExpressionOrHigher());
             }
-            if (saveDecoratorContext)
+            if (saveDecoratorContext) {
                 setDecoratorContext(true);
+            }
             return expr;
         }
         function parseInitializer(inParameter) {
@@ -7200,9 +7205,7 @@ var ts;
                         computedPropertyName.expression = arrayExpr.elements[0];
                         for (var i = 1; i < arrayExpr.elements.length; i++) {
                             var commaExpr = createNode(169, computedPropertyName.expression.pos);
-                            var commaToken = createNode(23, computedPropertyName.expression.end);
-                            commaToken.end = arrayExpr.elements[i].pos;
-                            commaExpr.operatorToken = commaToken;
+                            commaExpr.operatorToken = finishNode(createNode(23, 0), 0);
                             commaExpr.left = computedPropertyName.expression;
                             commaExpr.right = arrayExpr.elements[i];
                             computedPropertyName.expression = finishNode(commaExpr, commaExpr.right.end);
@@ -7569,8 +7572,9 @@ var ts;
             }
             return finishNode(node);
         }
-        function parseExportDeclaration(fullStart, modifiers) {
+        function parseExportDeclaration(fullStart, decorators, modifiers) {
             var node = createNode(211, fullStart);
+            node.decorators = decorators;
             setModifiers(node, modifiers);
             if (parseOptional(35)) {
                 parseExpected(103);
@@ -7663,7 +7667,7 @@ var ts;
                     return parseExportAssignmentTail(fullStart, decorators, modifiers);
                 }
                 if (token === 35 || token === 14) {
-                    return parseExportDeclaration(fullStart, modifiers);
+                    return parseExportDeclaration(fullStart, decorators, modifiers);
                 }
             }
             switch (token) {
@@ -8278,8 +8282,10 @@ var ts;
     var nextMergeId = 1;
     var EvalConstantFlags;
     (function (EvalConstantFlags) {
-        EvalConstantFlags[EvalConstantFlags["Numeric"] = 1] = "Numeric";
-        EvalConstantFlags[EvalConstantFlags["ConstEnum"] = 2] = "ConstEnum";
+        EvalConstantFlags[EvalConstantFlags["None"] = 0] = "None";
+        EvalConstantFlags[EvalConstantFlags["Enum"] = 1] = "Enum";
+        EvalConstantFlags[EvalConstantFlags["Constant"] = 2] = "Constant";
+        EvalConstantFlags[EvalConstantFlags["ConstEnum"] = 3] = "ConstEnum";
     })(EvalConstantFlags || (EvalConstantFlags = {}));
     ts.checkTime = 0;
     function createTypeChecker(host, produceDiagnostics) {
@@ -8290,6 +8296,9 @@ var ts;
         var emptyArray = [];
         var emptySymbols = {};
         var emptyMetadata = {};
+        var emptyDecoratorUsageMetadata = {};
+        var emptyObsoleteMetadata = {};
+        var sharedObsoleteMetadata = { obsolete: true };
         var compilerOptions = host.getCompilerOptions();
         var languageVersion = compilerOptions.target || 0;
         var emitResolver = createResolver();
@@ -8351,13 +8360,13 @@ var ts;
         var conditionalSymbols;
         var globals = {};
         var globalArraySymbol;
-        var globalESSymbolConstructorSymbol;
         var globalDecoratorSymbol;
         var globalTypeDecoratorSymbol;
         var globalParamTypesDecoratorSymbol;
         var globalReturnTypeDecoratorSymbol;
         var globalObsoleteDecoratorSymbol;
         var globalConditionalDecoratorSymbol;
+        var globalESSymbolConstructorSymbol;
         var globalObjectType;
         var globalFunctionType;
         var globalArrayType;
@@ -8827,7 +8836,30 @@ var ts;
         function getFullyQualifiedName(symbol) {
             return symbol.parent ? getFullyQualifiedName(symbol.parent) + "." + symbolToString(symbol) : symbolToString(symbol);
         }
+        function getLeftSideOfQualifiedNameOrPropertyAccessExpression(node) {
+            if (node.kind === 126) {
+                return node.left;
+            }
+            else {
+                var left = node.expression;
+                if (left.kind === 65 || left.kind === 155) {
+                    return left;
+                }
+            }
+            return undefined;
+        }
+        function getRightSideOfQualifiedNameOrPropertyAccessExpression(node) {
+            if (node.kind === 126) {
+                return node.right;
+            }
+            else {
+                return node.name;
+            }
+        }
         function resolveEntityName(location, name, meaning) {
+            return resolveEntityNameOrPropertyAccessExpression(location, name, meaning);
+        }
+        function resolveEntityNameOrPropertyAccessExpression(location, name, meaning) {
             if (ts.getFullWidth(name) === 0) {
                 return undefined;
             }
@@ -8837,13 +8869,22 @@ var ts;
                     return;
                 }
             }
-            else if (name.kind === 126) {
-                var namespace = resolveEntityName(location, name.left, 1536);
-                if (!namespace || namespace === unknownSymbol || ts.getFullWidth(name.right) === 0)
+            else if (name.kind === 126 || name.kind === 155) {
+                var left = getLeftSideOfQualifiedNameOrPropertyAccessExpression(name);
+                if (!left) {
                     return;
-                var symbol = getSymbol(getExportsOfSymbol(namespace), name.right.text, meaning);
+                }
+                var namespace = resolveEntityNameOrPropertyAccessExpression(location, left, 1536);
+                if (!namespace || namespace === unknownSymbol) {
+                    return;
+                }
+                var right = getRightSideOfQualifiedNameOrPropertyAccessExpression(name);
+                if (ts.getFullWidth(right) === 0) {
+                    return;
+                }
+                var symbol = getSymbol(getExportsOfSymbol(namespace), right.text, meaning);
                 if (!symbol) {
-                    error(location, ts.Diagnostics.Module_0_has_no_exported_member_1, getFullyQualifiedName(namespace), ts.declarationNameToString(name.right));
+                    error(location, ts.Diagnostics.Module_0_has_no_exported_member_1, getFullyQualifiedName(namespace), ts.declarationNameToString(right));
                     return;
                 }
             }
@@ -10569,6 +10610,14 @@ var ts;
         function getSignaturesOfType(type, kind) {
             return getSignaturesOfObjectOrUnionType(getApparentType(type), kind);
         }
+        function typeHasCallOrConstructSignatures(type) {
+            var apparentType = getApparentType(type);
+            if (apparentType.flags & (48128 | 16384)) {
+                var resolved = resolveObjectOrUnionTypeMembers(type);
+                return resolved.callSignatures.length > 0 || resolved.constructSignatures.length > 0;
+            }
+            return false;
+        }
         function getIndexTypeOfObjectOrUnionType(type, kind) {
             if (type.flags & (48128 | 16384)) {
                 var resolved = resolveObjectOrUnionTypeMembers(type);
@@ -10900,14 +10949,11 @@ var ts;
             }
             return type;
         }
-        function getGlobalConstEnumSymbol(name) {
-            return resolveName(undefined, name, 128, ts.Diagnostics.Cannot_find_global_type_0, name);
+        function getGlobalValueSymbol(name) {
+            return getGlobalSymbol(name, 107455, ts.Diagnostics.Cannot_find_global_value_0);
         }
         function getGlobalTypeSymbol(name) {
             return getGlobalSymbol(name, 793056, ts.Diagnostics.Cannot_find_global_type_0);
-        }
-        function getGlobalValueSymbol(name) {
-            return getGlobalSymbol(name, 107455, ts.Diagnostics.Cannot_find_global_value_0);
         }
         function getGlobalDecoratorSymbol(name) {
             return resolveName(undefined, name, 16, ts.Diagnostics.Cannot_find_global_decorator_function_0, name);
@@ -12573,7 +12619,9 @@ var ts;
             }
             checkCollisionWithCapturedSuperVariable(node, node);
             checkCollisionWithCapturedThisVariable(node, node);
+            checkUsageOfObsoleteSymbol(node, symbol);
             checkBlockScopedBindingCapturedInLoop(node, symbol);
+            checkConditionallyRemovedExpression(node, symbol);
             return getNarrowedTypeOfSymbol(getExportSymbolOfValueSymbolIfExported(symbol), node);
         }
         function isNameScopeBoundary(n) {
@@ -13163,9 +13211,6 @@ var ts;
         }
         function checkPropertyAccessExpression(node) {
             var type = checkPropertyAccessExpressionOrQualifiedName(node, node.expression, node.name);
-            if (!ts.isCallLikeExpression(node.parent)) {
-                checkUsageOfObsoleteSymbol(node, getNodeLinks(node).resolvedSymbol);
-            }
             return type;
         }
         function checkQualifiedName(node) {
@@ -13195,6 +13240,10 @@ var ts;
                     else {
                         checkClassPropertyAccess(node, left, type, prop);
                     }
+                }
+                if (node.kind === 155) {
+                    checkUsageOfObsoleteSymbol(node, prop);
+                    checkConditionallyRemovedExpression(node, prop);
                 }
                 return getTypeOfSymbol(prop);
             }
@@ -13763,31 +13812,24 @@ var ts;
             return ts.hasProperty(conditionalSymbols, condition.toUpperCase());
         }
         function checkConditionallyRemovedExpression(node, symbol) {
-            if (symbol) {
-                var metadataArray = getMetadataForSymbol(symbol);
-                var metadata = ts.findMetadata(metadataArray, globalConditionalDecoratorSymbol);
-                if (metadata && metadata.arguments.length > 0) {
-                    var conditionSymbol = metadata.arguments[0];
-                    if (conditionSymbol && !isConditionalSymbolDefined(conditionSymbol)) {
-                        getNodeLinks(node).flags = 16384;
-                    }
-                }
+            var links = getNodeLinks(node);
+            if (links.flags & 16384) {
+                return;
+            }
+            if (symbol && symbolIsConditionallyRemoved(symbol)) {
+                links.flags |= 16384;
             }
         }
         function checkUsageOfObsoleteSymbol(node, symbol) {
             if (symbol) {
-                var metadataArray = getMetadataForSymbol(symbol);
-                var metadata = ts.findMetadata(metadataArray, globalObsoleteDecoratorSymbol);
-                if (metadata) {
-                    if (metadata.arguments.length > 0) {
-                        error(node, ts.Diagnostics._0_is_obsolete_Colon_1, symbolToString(symbol), metadata.arguments[0]);
+                var metadata = getObsoleteMetadataForSymbol(symbol);
+                if (metadata.obsolete) {
+                    if (metadata.message) {
+                        error(node, ts.Diagnostics._0_is_obsolete_Colon_1, symbolToString(symbol), metadata.message);
                     }
                     else {
                         error(node, ts.Diagnostics._0_is_obsolete, symbolToString(symbol));
                     }
-                }
-                else if (symbol.parent) {
-                    checkUsageOfObsoleteSymbol(node, symbol.parent);
                 }
             }
         }
@@ -13808,8 +13850,9 @@ var ts;
                     }
                     return anyType;
                 }
-                checkConditionallyRemovedExpression(node, declaration.symbol);
-                checkUsageOfObsoleteSymbol(node, declaration.symbol);
+            }
+            if (getNodeCheckFlags(node.expression) & 16384) {
+                getNodeLinks(node).flags |= 16384;
             }
             return getReturnTypeOfSignature(signature);
         }
@@ -13818,10 +13861,8 @@ var ts;
                 grammarErrorOnFirstToken(node.template, ts.Diagnostics.Tagged_templates_are_only_available_when_targeting_ECMAScript_6_and_higher);
             }
             var signature = getResolvedSignature(node);
-            var declaration = signature.declaration;
-            if (declaration) {
-                checkConditionallyRemovedExpression(node, declaration.symbol);
-                checkUsageOfObsoleteSymbol(node, declaration.symbol);
+            if (getNodeCheckFlags(node.tag) & 16384) {
+                getNodeLinks(node).flags |= 16384;
             }
             return getReturnTypeOfSignature(signature);
         }
@@ -14991,40 +15032,33 @@ var ts;
                 }
             }
         }
-        function checkDecorators(node) {
-            if (!node.decorators) {
-                return;
+        function getResolvedSymbolOfDecorator(decorator) {
+            var links = getNodeLinks(decorator);
+            if (!links.resolvedSymbol) {
+                var expression = decorator.expression;
+                while (expression.kind === 161) {
+                    expression = expression.expression;
+                }
+                if (expression.kind === 157) {
+                    expression = expression.expression;
+                }
+                while (expression.kind === 161) {
+                    expression = expression.expression;
+                }
+                if (expression.kind === 155) {
+                    links.resolvedSymbol = resolveEntityNameOrPropertyAccessExpression(decorator, expression, 107455 | 1048576);
+                }
+                else if (expression.kind === 65) {
+                    links.resolvedSymbol = resolveEntityName(decorator, expression, 107455 | 1048576);
+                }
+                else {
+                    links.resolvedSymbol = unknownSymbol;
+                }
             }
-            checkGrammarDecorators(node);
-            switch (node.kind) {
-                case 134:
-                case 132:
-                case 136:
-                case 137:
-                    if (languageVersion >= 1 && node.parent.kind === 198) {
-                        emitDecorate = true;
-                    }
-                    break;
+            else if (links.resolvedSymbol === unknownSymbol) {
+                return undefined;
             }
-            ts.forEach(node.decorators, checkDecorator);
-        }
-        function getIdentifierOfDecoratorExpression(expression) {
-            while (expression.kind === 161) {
-                expression = expression.expression;
-            }
-            if (expression.kind === 157) {
-                expression = expression.expression;
-            }
-            while (expression.kind === 161) {
-                expression = expression.expression;
-            }
-            if (expression.kind === 155) {
-                return expression.name;
-            }
-            if (expression.kind === 65) {
-                return expression;
-            }
-            return undefined;
+            return links.resolvedSymbol;
         }
         function getArgumentsOfDecoratorExpression(expression) {
             while (expression.kind === 161) {
@@ -15040,7 +15074,7 @@ var ts;
             if (argumentList) {
                 var argumentCount = argumentList.length;
                 for (var i = 0; i < argumentCount; i++) {
-                    var value = evalConstant(argumentList[i], false, true);
+                    var value = evalConstant(argumentList[i], 2);
                     if (value === undefined) {
                         error(node, ts.Diagnostics.Argument_to_ambient_decorator_must_be_constant_expression);
                         return undefined;
@@ -15079,11 +15113,9 @@ var ts;
             if (decoratorIsBuiltIn(decoratorSymbol)) {
                 return true;
             }
-            var metadataArray = getMetadataForSymbol(decoratorSymbol);
-            var metadata = ts.findMetadata(metadataArray, globalDecoratorSymbol);
-            if (metadata && metadata.arguments.length > 0) {
-                var usage = metadata.arguments[0];
-                return usage && usage.ambient;
+            var usage = getDecoratorUsageForSymbol(decoratorSymbol);
+            if (usage) {
+                return usage.ambient;
             }
             return false;
         }
@@ -15100,19 +15132,16 @@ var ts;
             return false;
         }
         function resolveMetadataForDecorator(decorator) {
-            var name = getIdentifierOfDecoratorExpression(decorator.expression);
-            if (name) {
-                var symbol = getResolvedSymbol(name);
-                if (decoratorIsAmbient(symbol)) {
-                    var arguments = getArgumentsOfDecoratorExpression(decorator.expression);
-                    var argumentList = evalDecoratorArguments(decorator, arguments);
-                    if (argumentList) {
-                        var metadata = {
-                            symbol: symbol,
-                            arguments: argumentList
-                        };
-                        return metadata;
-                    }
+            var symbol = getResolvedSymbolOfDecorator(decorator);
+            if (decoratorIsAmbient(symbol)) {
+                var arguments = getArgumentsOfDecoratorExpression(decorator.expression);
+                var argumentList = evalDecoratorArguments(decorator, arguments);
+                if (argumentList) {
+                    var metadata = {
+                        symbol: symbol,
+                        arguments: argumentList
+                    };
+                    return metadata;
                 }
             }
             return emptyMetadata;
@@ -15138,6 +15167,24 @@ var ts;
             }
             return emptyArray;
         }
+        function filterMetadata(metadataArray, decoratorSymbol) {
+            if (metadataArray && decoratorSymbol) {
+                var results;
+                for (var i = 0; i < metadataArray.length; i++) {
+                    var metadata = metadataArray[i];
+                    if (metadata.symbol === decoratorSymbol) {
+                        if (!results) {
+                            results = [];
+                        }
+                        results.push(metadata);
+                    }
+                }
+            }
+            if (results) {
+                return results;
+            }
+            return emptyArray;
+        }
         function getMetadataForDecorator(node) {
             var links = getNodeLinks(node);
             if (!links.resolvedDecoratorMetadata) {
@@ -15153,11 +15200,84 @@ var ts;
             return links.resolvedDecoratorMetadata;
         }
         function getMetadataForSymbol(symbol) {
+            if (!symbol.valueDeclaration) {
+                return emptyArray;
+            }
             var links = getSymbolLinks(symbol);
             if (!links.decoratorMetadata) {
                 links.decoratorMetadata = resolveMetadataForSymbol(symbol);
             }
             return links.decoratorMetadata;
+        }
+        function getDecoratorUsageForSymbol(symbol) {
+            var links = getSymbolLinks(symbol);
+            if (!links.decoratorUsage) {
+                links.decoratorUsage = emptyDecoratorUsageMetadata;
+                var metadataArray = getMetadataForSymbol(symbol);
+                var metadata = ts.findMetadata(metadataArray, globalDecoratorSymbol);
+                if (metadata && metadata.arguments.length > 0) {
+                    links.decoratorUsage = metadata.arguments[0];
+                }
+            }
+            return links.decoratorUsage;
+        }
+        function getObsoleteMetadataForSymbol(symbol) {
+            var links = getSymbolLinks(symbol);
+            if (!links.obsolete) {
+                links.obsolete = emptyObsoleteMetadata;
+                var metadataArray = getMetadataForSymbol(symbol);
+                var metadata = ts.findMetadata(metadataArray, globalObsoleteDecoratorSymbol);
+                if (metadata) {
+                    if (metadata.arguments.length > 0) {
+                        links.obsolete = { obsolete: true, message: metadata.arguments[0] };
+                    }
+                    else {
+                        links.obsolete = sharedObsoleteMetadata;
+                    }
+                }
+            }
+            return links.obsolete;
+        }
+        function getConditionalMetadataForSymbol(symbol) {
+            var links = getSymbolLinks(symbol);
+            if (!links.conditionalSymbols) {
+                links.conditionalSymbols = emptyArray;
+                var metadataArray = getMetadataForSymbol(symbol);
+                var filteredMetadataArray = filterMetadata(metadataArray, globalConditionalDecoratorSymbol);
+                var metadataCount = filteredMetadataArray.length;
+                var conditions;
+                for (var i = 0; i < metadataCount; i++) {
+                    var metadata = filteredMetadataArray[i];
+                    if (metadata.arguments.length > 0) {
+                        if (!conditions) {
+                            conditions = [];
+                        }
+                        conditions.push(metadata.arguments[0]);
+                    }
+                }
+                links.conditionalSymbols = conditions || emptyArray;
+            }
+            return links.conditionalSymbols;
+        }
+        function symbolIsConditionallyRemoved(symbol) {
+            var links = getSymbolLinks(symbol);
+            if (links.conditionallyRemoved === undefined) {
+                links.conditionallyRemoved = false;
+                var conditionalSymbols = getConditionalMetadataForSymbol(symbol);
+                if (conditionalSymbols !== emptyArray) {
+                    var symbolCount = conditionalSymbols.length;
+                    for (var i = 0; i < symbolCount; i++) {
+                        if (!isConditionalSymbolDefined(conditionalSymbols[i])) {
+                            links.conditionallyRemoved = true;
+                            break;
+                        }
+                    }
+                }
+                if (!links.conditionallyRemoved && symbol.parent) {
+                    links.conditionallyRemoved = symbolIsConditionallyRemoved(symbol.parent);
+                }
+            }
+            return links.conditionallyRemoved;
         }
         function getValidDecoratorTarget(node) {
             if (node) {
@@ -15183,13 +15303,9 @@ var ts;
         function getDecoratorFlagsForDecorator(node, decoratorSymbol, exprType) {
             var flags;
             if (decoratorSymbol) {
-                var metadataArray = getMetadataForSymbol(decoratorSymbol);
-                var metadata = ts.findMetadata(metadataArray, globalDecoratorSymbol);
-                if (metadata && metadata.arguments.length > 0) {
-                    var usage = metadata.arguments[0];
-                    if (usage) {
-                        flags |= usage.targets & 8191;
-                    }
+                var usage = getDecoratorUsageForSymbol(decoratorSymbol);
+                if (usage) {
+                    flags |= usage.targets & 8191;
                 }
                 if (!flags) {
                     flags = 8191;
@@ -15221,112 +15337,104 @@ var ts;
             }
             return flags;
         }
-        function checkTypeAnnotationAsExpression(node) {
-            var typeNode;
-            if (isAccessor(node.kind)) {
-                typeNode = node.type;
-            }
-            else if (node.kind === 132) {
-                typeNode = node.type;
-            }
-            if (typeNode && typeNode.kind === 141) {
-                var type = getTypeOfSymbol(node.symbol);
-                if (type.symbol.valueDeclaration) {
-                    checkExpressionOrQualifiedName(typeNode.typeName);
+        function checkTypeNodeAsExpression(node) {
+            if (node && node.kind === 141) {
+                var type = getTypeFromTypeNode(node);
+                if (!type || type.flags & (1048703 | 132 | 258)) {
+                    return;
                 }
+                if (type.symbol.valueDeclaration) {
+                    checkExpressionOrQualifiedName(node.typeName);
+                }
+            }
+        }
+        function checkTypeAnnotationAsExpression(node) {
+            switch (node.kind) {
+                case 132: return checkTypeNodeAsExpression(node.type);
+                case 129: return checkTypeNodeAsExpression(node.type);
+                case 136: return checkTypeNodeAsExpression(node.type);
+                case 137: return checkTypeNodeAsExpression(getSetAccessorTypeAnnotationNode(node));
             }
         }
         function checkParameterTypeAnnotationsAsExpressions(node) {
-            var declaration;
-            if (node.kind === 198) {
-                declaration = ts.getFirstConstructorWithBody(node);
+            if (node) {
+                ts.forEach(node.parameters, checkTypeAnnotationAsExpression);
+            }
+        }
+        function checkBuiltInParameterDecorator(node, symbol, flags) {
+            var links = getNodeLinks(node.parent);
+            if (links.flags & flags) {
+                error(node, ts.Diagnostics._0_decorator_already_specified, "@" + symbol.name);
+            }
+            else if (links.flags & 1024) {
+                error(node, ts.Diagnostics._0_decorator_cannot_be_used_when_1_is_already_specified, "@" + symbol.name, "@" + globalTypeDecoratorSymbol.name);
+            }
+            else if (links.flags & 2048) {
+                error(node, ts.Diagnostics._0_decorator_cannot_be_used_when_1_is_already_specified, "@" + symbol.name, "@" + globalParamTypesDecoratorSymbol.name);
+            }
+            else if (links.flags & 4096) {
+                error(node, ts.Diagnostics._0_decorator_cannot_be_used_when_1_is_already_specified, "@" + symbol.name, "@" + globalReturnTypeDecoratorSymbol.name);
             }
             else {
-                declaration = node;
+                links.flags |= flags;
             }
-            if (declaration) {
-                var parameters = declaration.parameters;
-                var parameterCount = parameters.length;
-                for (var i = 0; i < parameterCount; i++) {
-                    var parameter = parameters[i];
-                    if (parameter.type && parameter.type.kind === 141) {
-                        var parameterType = getTypeOfSymbol(parameter.symbol);
-                        if (parameterType.symbol.valueDeclaration) {
-                            checkExpressionOrQualifiedName(parameter.type.typeName);
+        }
+        function checkBuiltInDecorator(node, symbol, metadata) {
+            switch (symbol) {
+                case globalDecoratorSymbol:
+                    if (metadata && metadata.arguments.length > 0) {
+                        var usage = metadata.arguments[0];
+                        if (usage.ambient) {
+                            getNodeLinks(node.parent).flags |= 8192;
                         }
                     }
-                }
+                    break;
+                case globalTypeDecoratorSymbol:
+                    checkBuiltInParameterDecorator(node, symbol, 1024);
+                    break;
+                case globalParamTypesDecoratorSymbol:
+                    checkBuiltInParameterDecorator(node, symbol, 2048);
+                    break;
+                case globalReturnTypeDecoratorSymbol:
+                    checkBuiltInParameterDecorator(node, symbol, 4096);
+                    break;
             }
         }
-        function checkReturnTypeAnnotationAsExpression(node) {
-            var returnTypeNode = node.type;
-            if (returnTypeNode && returnTypeNode.kind === 141) {
-                var returnTypeSymbol = getSymbolOfNode(returnTypeNode);
-                if (returnTypeSymbol.valueDeclaration) {
-                    checkExpressionOrQualifiedName(returnTypeNode.typeName);
-                }
-            }
-        }
-        function checkDecorator(node) {
-            var expression = node.expression;
-            var exprType = checkExpression(expression);
-            var name = getIdentifierOfDecoratorExpression(expression);
-            var symbol = name && getResolvedSymbol(name);
-            var flags = getDecoratorFlagsForDecorator(node, symbol, exprType);
-            if (!flags) {
-                reportInvalidDecoratorExpression(node, exprType);
+        function checkAmbientDecorator(node, symbol, flags) {
+            getNodeLinks(node).flags |= 8192;
+            var metadata = getMetadataForDecorator(node);
+            if (!metadata) {
                 return;
-            }
-            var validFlags = getValidDecoratorTarget(node.parent);
-            if ((flags & validFlags) === 0) {
-                if (name) {
-                    error(name, ts.Diagnostics.Decorator_0_is_not_valid_on_this_declaration_type, symbol.name);
-                }
-                else {
-                    error(expression, ts.Diagnostics.Decorator_is_not_valid_on_this_declaration_type);
-                }
-                return;
-            }
-            var metadata;
-            if (flags & 196608) {
-                getNodeLinks(node).flags |= 8192;
-                metadata = getMetadataForDecorator(node);
-                if (!metadata) {
-                    return;
-                }
-            }
-            else {
-                if (languageVersion < 1 && (validFlags & 2052) === 0) {
-                    error(node, ts.Diagnostics.Non_ambient_decorators_are_only_supported_on_class_members_when_targeting_ECMAScript_5_or_higher);
-                    return;
-                }
-                if (validFlags & 1792) {
-                    var memberSymbol = getSymbolOfNode(node.parent);
-                    var memberType = getTypeOfSymbol(memberSymbol);
-                }
             }
             if (flags & 65536) {
-                switch (symbol) {
-                    case globalDecoratorSymbol:
-                        if (metadata && metadata.arguments.length > 0) {
-                            var usage = metadata.arguments[0];
-                            if (usage.ambient) {
-                                getNodeLinks(node.parent).flags |= 8192;
-                            }
-                        }
-                        break;
-                    case globalTypeDecoratorSymbol:
-                        getNodeLinks(node.parent).flags |= 1024;
-                        break;
-                    case globalParamTypesDecoratorSymbol:
-                        getNodeLinks(node.parent).flags |= 2048;
-                        break;
-                    case globalReturnTypeDecoratorSymbol:
-                        getNodeLinks(node.parent).flags |= 4096;
-                        break;
-                }
+                checkBuiltInDecorator(node, symbol, metadata);
             }
-            else if (symbol && !(flags & 131072)) {
+        }
+        function checkDecoratorSignature(node, exprType, expectedDecoratorType, message) {
+            var parentSymbol = getSymbolOfNode(node.parent);
+            var parentType = getTypeOfSymbol(parentSymbol);
+            var signature = getSingleCallSignature(expectedDecoratorType);
+            var instantiatedSignature = getSignatureInstantiation(signature, [parentType]);
+            var signatureType = getOrCreateTypeFromSignature(instantiatedSignature);
+            checkTypeAssignableTo(exprType, signatureType, node, message);
+        }
+        function checkNonAmbientDecorator(node, symbol, exprType, flags) {
+            var validFlags = getValidDecoratorTarget(node.parent);
+            if ((flags & validFlags) === 0) {
+                error(node, ts.Diagnostics.Decorator_is_not_valid_on_this_declaration_type);
+                return;
+            }
+            if (languageVersion < 1 && (validFlags & 2052) === 0) {
+                error(node, ts.Diagnostics.Non_ambient_decorators_are_only_supported_on_class_members_when_targeting_ECMAScript_5_or_higher);
+                return;
+            }
+            if (validFlags & 1792) {
+                checkDecoratorSignature(node, exprType, globalMemberDecoratorFunctionType, ts.Diagnostics.Decorators_may_not_change_the_type_of_a_member);
+            }
+            else if (validFlags & 4) {
+                checkDecoratorSignature(node, exprType, globalDecoratorFunctionType, ts.Diagnostics.Decorators_may_not_change_the_type_of_a_class);
+            }
+            if (symbol) {
                 var valueDeclaration = symbol.valueDeclaration;
                 if (valueDeclaration && ts.isAnyFunction(valueDeclaration)) {
                     var hasTypeDecorator = false;
@@ -15351,14 +15459,50 @@ var ts;
                     if (hasTypeDecorator && (isAccessor(node.parent.kind) || node.kind === 132)) {
                         checkTypeAnnotationAsExpression(node.parent);
                     }
-                    if (hasParamTypesDecorator && (node.parent.kind === 198 || ts.isAnyFunction(node.parent))) {
+                    else if (hasParamTypesDecorator && node.parent.kind === 198) {
+                        checkParameterTypeAnnotationsAsExpressions(ts.getFirstConstructorWithBody(node.parent));
+                    }
+                    else if (hasParamTypesDecorator && ts.isAnyFunction(node.parent)) {
                         checkParameterTypeAnnotationsAsExpressions(node.parent);
                     }
-                    if (hasReturnTypeDecorator && ts.isAnyFunction(node.parent)) {
-                        checkReturnTypeAnnotationAsExpression(node.parent);
+                    else if (hasReturnTypeDecorator && ts.isAnyFunction(node.parent)) {
+                        checkTypeNodeAsExpression(node.parent.type);
                     }
                 }
             }
+        }
+        function checkDecorator(node) {
+            var expression = node.expression;
+            var exprType = checkExpression(expression);
+            var symbol = getResolvedSymbolOfDecorator(node);
+            var flags = getDecoratorFlagsForDecorator(node, symbol, exprType);
+            if (!flags) {
+                reportInvalidDecoratorExpression(node, exprType);
+                return;
+            }
+            if (flags & 196608) {
+                checkAmbientDecorator(node, symbol, flags);
+            }
+            else {
+                checkNonAmbientDecorator(node, symbol, exprType, flags);
+            }
+        }
+        function checkDecorators(node) {
+            if (!node.decorators) {
+                return;
+            }
+            checkGrammarDecorators(node);
+            switch (node.kind) {
+                case 134:
+                case 132:
+                case 136:
+                case 137:
+                    if (languageVersion >= 1 && node.parent.kind === 198) {
+                        emitDecorate = true;
+                    }
+                    break;
+            }
+            ts.forEach(node.decorators, checkDecorator);
         }
         function checkFunctionDeclaration(node) {
             if (produceDiagnostics) {
@@ -15625,6 +15769,9 @@ var ts;
         function checkExpressionStatement(node) {
             checkGrammarStatementInAmbientContext(node);
             checkExpression(node.expression);
+            if (getNodeCheckFlags(node.expression) & 16384) {
+                getNodeLinks(node).flags |= 16384;
+            }
         }
         function checkIfStatement(node) {
             checkGrammarStatementInAmbientContext(node);
@@ -16122,10 +16269,12 @@ var ts;
                 nodeLinks.flags |= 128;
             }
             function getConstantValueForEnumMemberInitializer(initializer, enumIsConst) {
-                return evalConstant(initializer, true, enumIsConst);
+                return evalConstant(initializer, enumIsConst ? 3 : 1);
             }
         }
-        function evalConstant(expression, isNumeric, isConst) {
+        function evalConstant(expression, flags) {
+            var isEnum = (flags & 1) !== 0;
+            var isConst = (flags & 2) !== 0;
             return evalConstantWorker(expression);
             function evalConstantWorker(e) {
                 switch (e.kind) {
@@ -16138,10 +16287,12 @@ var ts;
                             case 33: return value;
                             case 34: return -value;
                             case 47: return isConst ? ~value : undefined;
-                            case 46: return isNumeric ? undefined : !value;
                         }
-                        return undefined;
+                        break;
                     case 169:
+                        if (!isConst) {
+                            return undefined;
+                        }
                         var left = evalConstantWorker(e.left);
                         if (left === undefined) {
                             return undefined;
@@ -16162,18 +16313,14 @@ var ts;
                             case 33: return left + right;
                             case 34: return left - right;
                             case 37: return left % right;
-                            case 49: return isNumeric ? undefined : left || right;
-                            case 48: return isNumeric ? undefined : left && right;
                         }
                         break;
                     case 7:
                         return +e.text;
                     case 161:
                         return evalConstantWorker(e.expression);
-                    case 8:
-                        return isNumeric ? undefined : e.text;
                 }
-                if (isNumeric) {
+                if (isEnum) {
                     switch (e.kind) {
                         case 65:
                         case 156:
@@ -17303,7 +17450,10 @@ var ts;
         function serializeEntityName(node) {
             if (node.kind === 65) {
                 var substitution = getExpressionNameSubstitution(node);
-                return substitution || node.text;
+                if (substitution) {
+                    return substitution;
+                }
+                return node.text;
             }
             else {
                 return serializeEntityName(node.left) + "." + serializeEntityName(node.right);
@@ -17311,27 +17461,28 @@ var ts;
         }
         function serializeTypeReferenceNode(node) {
             var type = getTypeFromTypeReferenceNode(node);
-            var flags = type.flags;
-            if (flags & 16) {
+            if (type.flags & 16) {
                 return "void 0";
             }
             else if (type.flags & 8) {
                 return "Boolean";
             }
-            else if (flags & 132) {
+            else if (type.flags & 132) {
                 return "Number";
             }
-            else if (flags & 258) {
+            else if (type.flags & 258) {
                 return "String";
             }
-            else if (flags & 8192) {
+            else if (type.flags & 8192) {
                 return "Array";
+            }
+            else if (type.flags & 1048576) {
+                return "Symbol";
             }
             else if (type.symbol.valueDeclaration) {
                 return serializeEntityName(node.typeName);
             }
-            var signatures = getSignaturesOfType(type, 0);
-            if (signatures.length) {
+            else if (typeHasCallOrConstructSignatures(type)) {
                 return "Function";
             }
             return "Object";
@@ -17343,9 +17494,6 @@ var ts;
                         return "void 0";
                     case 149:
                         return serializeTypeNode(node.type);
-                    case 65:
-                    case 126:
-                        return serializeEntityName(node);
                     case 142:
                     case 143:
                         return "Function";
@@ -17371,47 +17519,45 @@ var ts;
             }
             return "Object";
         }
-        function serializeTypeOfDeclaration(node) {
+        function serializeTypeOfNode(node) {
             switch (node.kind) {
-                case 198:
-                    return serializeEntityName(node.name);
-                case 132:
-                case 129:
-                    return serializeTypeNode(node.type);
+                case 198: return serializeEntityName(node.name);
+                case 132: return serializeTypeNode(node.type);
+                case 129: return serializeTypeNode(node.type);
+                case 136: return serializeTypeNode(node.type);
+                case 137: return serializeTypeNode(getSetAccessorTypeAnnotationNode(node));
             }
             if (ts.isAnyFunction(node)) {
                 return "Function";
             }
-            return "Object";
+            return "void 0";
         }
-        function serializeParameterTypesOfDeclaration(node) {
-            var valueDeclaration;
-            if (node.kind === 198) {
-                valueDeclaration = ts.getFirstConstructorWithBody(node);
-            }
-            else if (ts.isAnyFunction(node) && ts.nodeIsPresent(node.body)) {
-                valueDeclaration = node;
-            }
-            if (valueDeclaration) {
-                var result;
-                var parameters = valueDeclaration.parameters;
-                var parameterCount = parameters.length;
-                if (parameterCount > 0) {
-                    result = new Array(parameterCount);
-                    for (var i = 0; i < parameterCount; i++) {
-                        result[i] = serializeTypeOfDeclaration(parameters[i]);
+        function serializeParameterTypesOfNode(node) {
+            if (node) {
+                var valueDeclaration;
+                if (node.kind === 198) {
+                    valueDeclaration = ts.getFirstConstructorWithBody(node);
+                }
+                else if (ts.isAnyFunction(node) && ts.nodeIsPresent(node.body)) {
+                    valueDeclaration = node;
+                }
+                if (valueDeclaration) {
+                    var result;
+                    var parameters = valueDeclaration.parameters;
+                    var parameterCount = parameters.length;
+                    if (parameterCount > 0) {
+                        result = new Array(parameterCount);
+                        for (var i = 0; i < parameterCount; i++) {
+                            result[i] = serializeTypeOfNode(parameters[i]);
+                        }
+                        return result;
                     }
-                    return result;
                 }
             }
             return emptyArray;
         }
-        function serializeReturnTypeOfDeclaration(node) {
-            var valueDeclaration;
-            if (node.kind === 198) {
-                return serializeTypeOfDeclaration(node);
-            }
-            else if (ts.isAnyFunction(node)) {
+        function serializeReturnTypeOfNode(node) {
+            if (node && ts.isAnyFunction(node)) {
                 return serializeTypeNode(node.type);
             }
             return "void 0";
@@ -17461,9 +17607,9 @@ var ts;
                 setDeclarationsOfIdentifierAsVisible: setDeclarationsOfIdentifierAsVisible,
                 getBlockScopedVariableId: getBlockScopedVariableId,
                 getResolvedSignature: getResolvedSignature,
-                serializeTypeOfDeclaration: serializeTypeOfDeclaration,
-                serializeParameterTypesOfDeclaration: serializeParameterTypesOfDeclaration,
-                serializeReturnTypeOfDeclaration: serializeReturnTypeOfDeclaration,
+                serializeTypeOfNode: serializeTypeOfNode,
+                serializeParameterTypesOfNode: serializeParameterTypesOfNode,
+                serializeReturnTypeOfNode: serializeReturnTypeOfNode,
                 getMetadataForSymbol: getMetadataForSymbol
             };
         }
@@ -17488,16 +17634,16 @@ var ts;
             globalNumberType = getGlobalType("Number");
             globalBooleanType = getGlobalType("Boolean");
             globalRegExpType = getGlobalType("RegExp");
-            globalTypedPropertyDescriptorType = getTypeOfGlobalSymbol(getGlobalSymbol("TypedPropertyDescriptor", 793056, ts.Diagnostics.Cannot_find_name_0), 1);
+            globalTypedPropertyDescriptorType = getTypeOfGlobalSymbol(getGlobalTypeSymbol("TypedPropertyDescriptor"), 1);
             globalDecoratorFunctionType = getGlobalType("DecoratorFunction");
             globalParameterDecoratorFunctionType = getGlobalType("ParameterDecoratorFunction");
             globalMemberDecoratorFunctionType = getGlobalType("MemberDecoratorFunction");
-            globalDecoratorSymbol = getGlobalDecoratorSymbol("decorator");
-            globalTypeDecoratorSymbol = getGlobalDecoratorSymbol("type");
-            globalParamTypesDecoratorSymbol = getGlobalDecoratorSymbol("paramtypes");
-            globalReturnTypeDecoratorSymbol = getGlobalDecoratorSymbol("returntype");
-            globalObsoleteDecoratorSymbol = getGlobalDecoratorSymbol("obsolete");
-            globalConditionalDecoratorSymbol = getGlobalDecoratorSymbol("conditional");
+            globalDecoratorSymbol = getGlobalValueSymbol("decorator");
+            globalTypeDecoratorSymbol = getGlobalValueSymbol("type");
+            globalParamTypesDecoratorSymbol = getGlobalValueSymbol("paramtypes");
+            globalReturnTypeDecoratorSymbol = getGlobalValueSymbol("returntype");
+            globalObsoleteDecoratorSymbol = getGlobalValueSymbol("obsolete");
+            globalConditionalDecoratorSymbol = getGlobalValueSymbol("conditional");
             if (languageVersion >= 2) {
                 globalTemplateStringsArrayType = getGlobalType("TemplateStringsArray");
                 globalESSymbolType = getGlobalType("Symbol");
@@ -19838,8 +19984,8 @@ var ts;
                         lastRecordedSourceMapSpan.emittedLine != emittedLine ||
                         lastRecordedSourceMapSpan.emittedColumn != emittedColumn ||
                         (lastRecordedSourceMapSpan.sourceIndex === sourceMapSourceIndex &&
-                            (lastRecordedSourceMapSpan.sourceLine > sourceLinePos.line ||
-                                (lastRecordedSourceMapSpan.sourceLine === sourceLinePos.line && lastRecordedSourceMapSpan.sourceColumn > sourceLinePos.character)))) {
+                        (lastRecordedSourceMapSpan.sourceLine > sourceLinePos.line ||
+                        (lastRecordedSourceMapSpan.sourceLine === sourceLinePos.line && lastRecordedSourceMapSpan.sourceColumn > sourceLinePos.character)))) {
                         encodeLastRecordedSourceMapSpan();
                         lastRecordedSourceMapSpan = {
                             emittedLine: emittedLine,
@@ -20064,7 +20210,7 @@ var ts;
                 return startPos + tokenString.length;
             }
             function emitOptional(prefix, node) {
-                if (node) {
+                if (node && !(resolver.getNodeCheckFlags(node) & 16384)) {
                     write(prefix);
                     emit(node);
                 }
@@ -20773,7 +20919,7 @@ var ts;
                 }
             }
             function emitCallExpression(node) {
-                if (resolver.getNodeCheckFlags(node) & 16384) {
+                if (resolver.getNodeCheckFlags(node.expression) & 16384) {
                     emitVoidExpressionForConditionalRemoval(node);
                     return;
                 }
@@ -20806,7 +20952,7 @@ var ts;
                 }
             }
             function emitNewExpression(node) {
-                if (resolver.getNodeCheckFlags(node) & 16384) {
+                if (resolver.getNodeCheckFlags(node.expression) & 16384) {
                     emitVoidExpressionForConditionalRemoval(node);
                     return;
                 }
@@ -20819,7 +20965,7 @@ var ts;
                 }
             }
             function emitTaggedTemplateExpression(node) {
-                if (resolver.getNodeCheckFlags(node) & 16384) {
+                if (resolver.getNodeCheckFlags(node.tag) & 16384) {
                     emitVoidExpressionForConditionalRemoval(node);
                     return;
                 }
@@ -21202,13 +21348,6 @@ var ts;
                 emitNode(node.name);
                 emitEnd(node.name);
             }
-            function createVoidZero() {
-                var zero = ts.createNode(7);
-                zero.text = "0";
-                var result = ts.createNode(166);
-                result.expression = zero;
-                return result;
-            }
             function emitExportMemberAssignments(name) {
                 if (exportSpecifiers && ts.hasProperty(exportSpecifiers, name.text)) {
                     ts.forEach(exportSpecifiers[name.text], function (specifier) {
@@ -21223,6 +21362,13 @@ var ts;
                         write(";");
                     });
                 }
+            }
+            function createVoidZero() {
+                var zero = ts.createNode(7);
+                zero.text = "0";
+                var result = ts.createNode(166);
+                result.expression = zero;
+                return result;
             }
             function emitDestructuring(root, value) {
                 var emitCount = 0;
@@ -21868,10 +22014,7 @@ var ts;
                         emitLeadingComments(member);
                         emitStart(member);
                         emitStart(member.name);
-                        emitNode(node.name);
-                        if (!(member.flags & 128)) {
-                            write(".prototype");
-                        }
+                        emitTargetOfClassElement(node, member);
                         if (member.decorators && !computedPropertyNameCache && member.name.kind === 127) {
                             computedPropertyNameCache = [];
                         }
@@ -22128,18 +22271,12 @@ var ts;
                     case 129:
                         return true;
                 }
-                return false;
             }
-            function shouldEmitSerializedParameterTypesOrReturnTypeForNode(decorated) {
-                switch (decorated.kind) {
-                    case 198:
-                    case 135:
-                    case 134:
-                    case 136:
-                    case 137:
-                        return true;
-                }
-                return false;
+            function shouldEmitSerializedParameterTypesForNode(decorated) {
+                return decorated.kind === 198 || ts.isAnyFunction(decorated);
+            }
+            function shouldEmitSerializedReturnTypeForNode(decorated) {
+                return ts.isAnyFunction(decorated);
             }
             function createSerializedTypeExpression(type) {
                 if (!type || type === "void 0") {
@@ -22178,30 +22315,29 @@ var ts;
                 for (var i = argCount; i < parameterCount; i++) {
                     var parameter = parameters[i];
                     var flags = resolver.getNodeCheckFlags(parameter);
-                    if (flags & (1024 | 2048 | 4096)) {
-                        var shouldEmitCompilerGeneratedArgument = flags & 1024 ? shouldEmitSerializedTypeForNode : shouldEmitSerializedParameterTypesOrReturnTypeForNode;
-                        if (shouldEmitCompilerGeneratedArgument(decorated)) {
-                            if (!newArgumentList) {
-                                newArgumentList = args.slice(0);
-                            }
-                            while (lastArg < i) {
-                                newArgumentList.push(createVoidZero());
-                                lastArg++;
-                            }
-                            if (flags & 1024) {
-                                var serializedType = resolver.serializeTypeOfDeclaration(decorated);
-                                newArgumentList.push(createSerializedTypeExpression(serializedType));
-                            }
-                            else if (flags & 2048) {
-                                var serializedTypes = resolver.serializeParameterTypesOfDeclaration(decorated);
-                                newArgumentList.push(createSerializedTypeArrayExpression(serializedTypes));
-                            }
-                            else if (flags & 4096) {
-                                var serializedType = resolver.serializeReturnTypeOfDeclaration(decorated);
-                                newArgumentList.push(createSerializedTypeExpression(serializedType));
-                            }
+                    var serializedArgument = undefined;
+                    if (flags & 1024) {
+                        var serializedType = resolver.serializeTypeOfNode(decorated);
+                        serializedArgument = createSerializedTypeExpression(serializedType);
+                    }
+                    else if (flags & 2048) {
+                        var serializedTypes = resolver.serializeParameterTypesOfNode(decorated);
+                        serializedArgument = createSerializedTypeArrayExpression(serializedTypes);
+                    }
+                    else if (flags & 4096) {
+                        var serializedType = resolver.serializeReturnTypeOfNode(decorated);
+                        serializedArgument = createSerializedTypeExpression(serializedType);
+                    }
+                    if (serializedArgument) {
+                        if (!newArgumentList) {
+                            newArgumentList = args.slice(0);
+                        }
+                        while (lastArg < i) {
+                            newArgumentList.push(createVoidZero());
                             lastArg++;
                         }
+                        newArgumentList.push(serializedArgument);
+                        lastArg++;
                     }
                 }
                 if (newArgumentList) {
