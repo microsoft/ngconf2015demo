@@ -1,0 +1,8 @@
+{
+    "compilerOptions": {
+        "module":"AMD"
+    },
+    "files": [
+        "todo.ts"
+    ]
+}
