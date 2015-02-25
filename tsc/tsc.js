@@ -3748,6 +3748,11 @@ var ts;
             return false;
         }
         var parent = name.parent;
+        if (parent.kind === 209 || parent.kind === 213) {
+            if (parent.propertyName) {
+                return true;
+            }
+        }
         if (isDeclaration(parent) || parent.kind === 162) {
             return parent.name === name;
         }
@@ -8335,7 +8340,8 @@ var ts;
             getSignatureFromDeclaration: getSignatureFromDeclaration,
             isImplementationOfOverload: isImplementationOfOverload,
             getAliasedSymbol: resolveImport,
-            getEmitResolver: getEmitResolver
+            getEmitResolver: getEmitResolver,
+            getExportsOfExternalModule: getExportsOfExternalModule
         };
         var undefinedSymbol = createSymbol(4 | 67108864, "undefined");
         var argumentsSymbol = createSymbol(4 | 67108864, "arguments");
@@ -8987,22 +8993,22 @@ var ts;
         function getExportsOfSymbol(symbol) {
             return symbol.flags & 1536 ? getExportsOfModule(symbol) : symbol.exports;
         }
-        function getExportsOfModule(symbol) {
-            var links = getSymbolLinks(symbol);
-            return links.resolvedExports || (links.resolvedExports = getExportsForModule(symbol));
+        function getExportsOfModule(moduleSymbol) {
+            var links = getSymbolLinks(moduleSymbol);
+            return links.resolvedExports || (links.resolvedExports = getExportsForModule(moduleSymbol));
         }
-        function getExportsForModule(symbol) {
+        function getExportsForModule(moduleSymbol) {
             var result;
             var visitedSymbols = [];
-            visit(symbol);
-            return result;
+            visit(moduleSymbol);
+            return result || moduleSymbol.exports;
             function visit(symbol) {
                 if (!ts.contains(visitedSymbols, symbol)) {
                     visitedSymbols.push(symbol);
-                    if (!result) {
-                        result = symbol.exports;
-                    }
-                    else {
+                    if (symbol !== moduleSymbol) {
+                        if (!result) {
+                            result = cloneSymbolTable(moduleSymbol.exports);
+                        }
                         extendSymbolTable(result, symbol.exports);
                     }
                     ts.forEach(symbol.declarations, function (node) {
@@ -10636,6 +10642,16 @@ var ts;
                 }
             });
             return result;
+        }
+        function getExportsOfExternalModule(node) {
+            if (!node.moduleSpecifier) {
+                return emptyArray;
+            }
+            var module = resolveExternalModuleName(node, node.moduleSpecifier);
+            if (!module || !module.exports) {
+                return emptyArray;
+            }
+            return ts.mapToArray(getExportsOfModule(module));
         }
         function getSignatureFromDeclaration(declaration) {
             var links = getNodeLinks(declaration);
@@ -17148,11 +17164,12 @@ var ts;
                     }
                     return undefined;
                 case 8:
-                    if (ts.isExternalModuleImportEqualsDeclaration(node.parent.parent) &&
-                        ts.getExternalModuleImportEqualsDeclarationExpression(node.parent.parent) === node) {
-                        var importSymbol = getSymbolOfNode(node.parent.parent);
-                        var moduleType = getTypeOfSymbol(importSymbol);
-                        return moduleType ? moduleType.symbol : undefined;
+                    var moduleName;
+                    if ((ts.isExternalModuleImportEqualsDeclaration(node.parent.parent) &&
+                        ts.getExternalModuleImportEqualsDeclarationExpression(node.parent.parent) === node) ||
+                        ((node.parent.kind === 205 || node.parent.kind === 211) &&
+                            node.parent.moduleSpecifier === node)) {
+                        return resolveExternalModuleName(node, node);
                     }
                 case 7:
                     if (node.parent.kind == 156 && node.parent.argumentExpression === node) {
