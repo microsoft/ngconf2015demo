@@ -1,8 +1,9 @@
+**build:**
 ```
 node tsc\tsc.js -m amd todo.ts
 ```
 
-**Testing:**
+**run:**
 - install http-server package via
  ```
  npm install -g http-server 
@@ -11,3 +12,13 @@ node tsc\tsc.js -m amd todo.ts
  ```
  http-server -p 8080
  ```
+
+**update Visual Studio:**
+- Visual Studio 2013
+```
+vs\VSDevMode.ps1 -vsVersion 12 -tsScript tsc\ 
+```
+- Visual Studio 2015 CTP
+```
+vs\VSDevMode.ps1 -vsVersion 14 -tsScript tsc\ 
+```
