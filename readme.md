@@ -14,11 +14,5 @@ node tsc\tsc.js -m amd todo.ts
  ```
 
 **update Visual Studio:**
-- Visual Studio 2013
-```
-vs\VSDevMode.ps1 -vsVersion 12 -tsScript tsc\ 
-```
-- Visual Studio 2015 CTP
-```
-vs\VSDevMode.ps1 -vsVersion 14 -tsScript tsc\ 
-```
+- Visual Studio 2013 `vs\VSDevMode.ps1 -vsVersion 12 -tsScript tsc\`
+- Visual Studio 2015 CTP `vs\VSDevMode.ps1 -vsVersion 14 -tsScript tsc\`
