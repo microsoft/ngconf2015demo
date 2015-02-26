@@ -1,5 +1,3 @@
-/// <reference path='firebase/firebase.d.ts'/>
-
 import {Component, Template} from 'annotations';
 import {bootstrap, Foreach} from 'angular2/angular2';
 import {bind} from 'angular2/di';
