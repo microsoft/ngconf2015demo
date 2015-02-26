@@ -57,10 +57,10 @@ class TodoApp {
   }
   toggleAll($event) {
     var isComplete = $event.target.checked;
-    this.todoService.list.forEach(function(todo) {
+    this.todoService.list.forEach((todo)=> {
       todo.completed = isComplete;
       this.todoService.save(todo);
-    }.bind(this));
+    });
   }
   clearCompleted() {
     var toClear = {};
