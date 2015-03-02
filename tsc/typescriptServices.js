@@ -15350,7 +15350,7 @@ var ts;
                 if (!isTypeAssignableTo(globalMemberDecoratorFunctionType, widenedType) && !isTypeAssignableTo(exprType, globalMemberDecoratorFunctionType)) {
                     flags &= ~1792;
                 }
-                if (isTypeAssignableTo(globalParameterDecoratorFunctionType, widenedType) || isTypeAssignableTo(exprType, globalParameterDecoratorFunctionType)) {
+                if (!isTypeAssignableTo(globalParameterDecoratorFunctionType, widenedType) && !isTypeAssignableTo(exprType, globalParameterDecoratorFunctionType)) {
                     flags &= ~2048;
                 }
             }
@@ -15433,6 +15433,9 @@ var ts;
             var parentSymbol = getSymbolOfNode(node.parent);
             var parentType = getTypeOfSymbol(parentSymbol);
             var signature = getSingleCallSignature(expectedDecoratorType);
+            if (!signature) {
+                return;
+            }
             var instantiatedSignature = getSignatureInstantiation(signature, [parentType]);
             var signatureType = getOrCreateTypeFromSignature(instantiatedSignature);
             checkTypeAssignableTo(exprType, signatureType, node, message);
@@ -33096,4 +33099,4 @@ var TypeScript;
         Services.TypeScriptServicesFactory = ts.TypeScriptServicesFactory;
     })(Services = TypeScript.Services || (TypeScript.Services = {}));
 })(TypeScript || (TypeScript = {}));
-//# sourceMappingURL=file:///c:/ts/built/local/typescriptServices.js.map
+//# sourceMappingURL=file:///C:/Sources/TS/TypeScript/built/local/typescriptServices.js.map

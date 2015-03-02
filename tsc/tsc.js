@@ -9014,7 +9014,10 @@ var ts;
                     ts.forEach(symbol.declarations, function (node) {
                         if (node.kind === 223 || node.kind === 202) {
                             ts.forEach(node.exportStars, function (exportStar) {
-                                visit(resolveExternalModuleName(exportStar, exportStar.moduleSpecifier));
+                                var moduleSymbol = resolveExternalModuleName(exportStar, exportStar.moduleSpecifier);
+                                if (moduleSymbol) {
+                                    visit(moduleSymbol);
+                                }
                             });
                         }
                     });
@@ -15347,7 +15350,7 @@ var ts;
                 if (!isTypeAssignableTo(globalMemberDecoratorFunctionType, widenedType) && !isTypeAssignableTo(exprType, globalMemberDecoratorFunctionType)) {
                     flags &= ~1792;
                 }
-                if (isTypeAssignableTo(globalParameterDecoratorFunctionType, widenedType) || isTypeAssignableTo(exprType, globalParameterDecoratorFunctionType)) {
+                if (!isTypeAssignableTo(globalParameterDecoratorFunctionType, widenedType) && !isTypeAssignableTo(exprType, globalParameterDecoratorFunctionType)) {
                     flags &= ~2048;
                 }
             }
@@ -15430,6 +15433,9 @@ var ts;
             var parentSymbol = getSymbolOfNode(node.parent);
             var parentType = getTypeOfSymbol(parentSymbol);
             var signature = getSingleCallSignature(expectedDecoratorType);
+            if (!signature) {
+                return;
+            }
             var instantiatedSignature = getSignatureInstantiation(signature, [parentType]);
             var signatureType = getOrCreateTypeFromSignature(instantiatedSignature);
             checkTypeAssignableTo(exprType, signatureType, node, message);

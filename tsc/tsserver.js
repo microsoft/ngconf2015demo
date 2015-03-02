@@ -9386,7 +9386,10 @@ var ts;
                     ts.forEach(symbol.declarations, function (node) {
                         if (node.kind === 223 || node.kind === 202) {
                             ts.forEach(node.exportStars, function (exportStar) {
-                                visit(resolveExternalModuleName(exportStar, exportStar.moduleSpecifier));
+                                var moduleSymbol = resolveExternalModuleName(exportStar, exportStar.moduleSpecifier);
+                                if (moduleSymbol) {
+                                    visit(moduleSymbol);
+                                }
                             });
                         }
                     });
@@ -15719,7 +15722,7 @@ var ts;
                 if (!isTypeAssignableTo(globalMemberDecoratorFunctionType, widenedType) && !isTypeAssignableTo(exprType, globalMemberDecoratorFunctionType)) {
                     flags &= ~1792;
                 }
-                if (isTypeAssignableTo(globalParameterDecoratorFunctionType, widenedType) || isTypeAssignableTo(exprType, globalParameterDecoratorFunctionType)) {
+                if (!isTypeAssignableTo(globalParameterDecoratorFunctionType, widenedType) && !isTypeAssignableTo(exprType, globalParameterDecoratorFunctionType)) {
                     flags &= ~2048;
                 }
             }
@@ -15802,6 +15805,9 @@ var ts;
             var parentSymbol = getSymbolOfNode(node.parent);
             var parentType = getTypeOfSymbol(parentSymbol);
             var signature = getSingleCallSignature(expectedDecoratorType);
+            if (!signature) {
+                return;
+            }
             var instantiatedSignature = getSignatureInstantiation(signature, [parentType]);
             var signatureType = getOrCreateTypeFromSignature(instantiatedSignature);
             checkTypeAssignableTo(exprType, signatureType, node, message);
@@ -29319,30 +29325,110 @@ var ts;
                 }
             });
         }
+        function recordModuleName() {
+            var importPath = scanner.getTokenValue();
+            var pos = scanner.getTokenPos();
+            importedFiles.push({
+                fileName: importPath,
+                pos: pos,
+                end: pos + importPath.length
+            });
+        }
         function processImport() {
             scanner.setText(sourceText);
             var token = scanner.scan();
             while (token !== 1) {
                 if (token === 85) {
                     token = scanner.scan();
-                    if (token === 65) {
-                        token = scanner.scan();
-                        if (token === 53) {
+                    if (token === 8) {
+                        recordModuleName();
+                        continue;
+                    }
+                    else {
+                        if (token === 65) {
                             token = scanner.scan();
-                            if (token === 119) {
+                            if (token === 103) {
                                 token = scanner.scan();
-                                if (token === 16) {
+                                if (token === 8) {
+                                    recordModuleName();
+                                    continue;
+                                }
+                            }
+                            else if (token === 53) {
+                                token = scanner.scan();
+                                if (token === 119) {
                                     token = scanner.scan();
-                                    if (token === 8) {
-                                        var importPath = scanner.getTokenValue();
-                                        var pos = scanner.getTokenPos();
-                                        importedFiles.push({
-                                            fileName: importPath,
-                                            pos: pos,
-                                            end: pos + importPath.length
-                                        });
+                                    if (token === 16) {
+                                        token = scanner.scan();
+                                        if (token === 8) {
+                                            recordModuleName();
+                                            continue;
+                                        }
                                     }
                                 }
+                            }
+                            else if (token === 23) {
+                                token = scanner.scan();
+                            }
+                            else {
+                                continue;
+                            }
+                        }
+                        if (token === 14) {
+                            token = scanner.scan();
+                            while (token !== 14 && token !== 15) {
+                                token = scanner.scan();
+                            }
+                            if (token === 15) {
+                                token = scanner.scan();
+                                if (token === 103) {
+                                    token = scanner.scan();
+                                    if (token === 8) {
+                                        recordModuleName();
+                                    }
+                                }
+                            }
+                        }
+                        else if (token === 35) {
+                            token = scanner.scan();
+                            if (token === 102) {
+                                token = scanner.scan();
+                                if (token === 65) {
+                                    token = scanner.scan();
+                                    if (token === 103) {
+                                        token = scanner.scan();
+                                        if (token === 8) {
+                                            recordModuleName();
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (token === 78) {
+                    token = scanner.scan();
+                    if (token === 14) {
+                        token = scanner.scan();
+                        while (token !== 14 && token !== 15) {
+                            token = scanner.scan();
+                        }
+                        if (token === 15) {
+                            token = scanner.scan();
+                            if (token === 103) {
+                                token = scanner.scan();
+                                if (token === 8) {
+                                    recordModuleName();
+                                }
+                            }
+                        }
+                    }
+                    else if (token === 35) {
+                        token = scanner.scan();
+                        if (token === 103) {
+                            token = scanner.scan();
+                            if (token === 8) {
+                                recordModuleName();
                             }
                         }
                     }
