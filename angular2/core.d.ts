@@ -1,3 +1,5 @@
+/// <reference path='globals.d.ts'/>
+
 export * from './src/core/annotations/annotations';
 export * from './src/core/annotations/visibility';
 export * from './src/core/compiler/interfaces';
