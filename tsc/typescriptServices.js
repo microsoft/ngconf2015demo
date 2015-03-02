@@ -7605,7 +7605,7 @@ var ts;
         function isLetDeclaration() {
             return inStrictModeContext() || lookAhead(nextTokenIsIdentifierOnSameLine);
         }
-        function isDeclarationStart() {
+        function isDeclarationStart(followsModifier) {
             switch (token) {
                 case 98:
                 case 70:
@@ -7631,7 +7631,7 @@ var ts;
                 case 111:
                     return lookAhead(nextTokenIsDeclarationStart);
                 case 52:
-                    return true;
+                    return !followsModifier;
             }
         }
         function isIdentifierOrKeyword() {
@@ -7653,11 +7653,11 @@ var ts;
         function nextTokenCanFollowExportKeyword() {
             nextToken();
             return token === 53 || token === 35 ||
-                token === 14 || isDeclarationStart();
+                token === 14 || isDeclarationStart(true);
         }
         function nextTokenIsDeclarationStart() {
             nextToken();
-            return isDeclarationStart();
+            return isDeclarationStart(true);
         }
         function nextTokenIsAsKeyword() {
             return nextToken() === 102;
