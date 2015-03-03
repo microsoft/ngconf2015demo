@@ -19,6 +19,7 @@ node tsc\tsc.js -m amd todo.ts
 
 
 **update Sublime Text:**
+
 copy sublime\typescript folder into the Sublime Text packages folder
 
 Sublime Text packages folder default location:
