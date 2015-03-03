@@ -23,9 +23,10 @@ node tsc\tsc.js -m amd todo.ts
 copy sublime\typescript folder into the Sublime Text packages folder
 
 Sublime Text packages folder default location:
-•	Windows Sublime 2: %APPDATA%\Sublime Text 2\Packages
-•	Windows Sublime 3: %APPDATA%\Sublime Text 3\Packages
-•	OS X: ~/Library/Application Support/Sublime Text 2
-•	OS X: ~/Library/Application Support/Sublime Text 3
-•	Linux: ~/.Sublime Text 2
-•	Linux: ~/.Sublime Text 3
+
+-	Windows Sublime 2: %APPDATA%\Sublime Text 2\Packages
+-	Windows Sublime 3: %APPDATA%\Sublime Text 3\Packages
+-	OS X: ~/Library/Application Support/Sublime Text 2
+-	OS X: ~/Library/Application Support/Sublime Text 3
+-	Linux: ~/.Sublime Text 2
+-	Linux: ~/.Sublime Text 3
