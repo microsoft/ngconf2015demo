@@ -1,6 +1,6 @@
 **build:**
 ```
-node tsc\tsc.js -m amd todo.ts
+node tsc/tsc.js -m amd todo.ts
 ```
 
 **run:**
