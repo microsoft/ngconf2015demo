@@ -29097,7 +29097,7 @@ var ts;
     function getDefaultCompilerOptions() {
         return {
             target: 1,
-            module: 0
+            module: ts.ModuleKind.AMD
         };
     }
     ts.getDefaultCompilerOptions = getDefaultCompilerOptions;
