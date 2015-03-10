@@ -16,10 +16,12 @@ import {AngularFire, FirebaseArray} from 'firebase/AngularFire';
 class TodoApp {
   todoService: FirebaseArray;
   todoEdit: any;
+  todoFilter: Boolean;
 
   constructor(sync: AngularFire) {
     this.todoService = sync.asArray();
     this.todoEdit = null;
+    this.todoFilter = null;
   }
   enterTodo($event, newTodo) {
     if($event.which === 13) { // ENTER_KEY
@@ -70,6 +72,15 @@ class TodoApp {
       }
     });
     this.todoService.bulkUpdate(toClear);
+  }
+  showAll() {
+    this.todoFilter = null;
+  }
+  showActive() {
+    this.todoFilter = true;
+  }
+  showCompleted() {
+    this.todoFilter = false;
   }
 
 }
