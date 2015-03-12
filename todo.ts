@@ -1,7 +1,7 @@
 import {Component, Template} from 'annotations';
 import {bootstrap, Foreach} from 'angular2/angular2';
 import {bind} from 'angular2/di';
-import {AngularFire, FirebaseArray} from 'firebase/AngularFire';
+import {AngularFire, FirebaseArray} from 'firebase/angularfire';
 
 @Component({
   selector: 'todo-app',
