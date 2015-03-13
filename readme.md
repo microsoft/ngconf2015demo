@@ -14,10 +14,11 @@ node tsc/tsc.js -m amd todo.ts
  ```
 
 **update Visual Studio:**
+
 open a powershell command prompt in the ngconf2015demo folder and run one of the below commands/scripts
 - Visual Studio 2013 `vs\VSDevMode.ps1 -vsVersion 12 -tsScript tsc\`
 - Visual Studio 2015 CTP `vs\VSDevMode.ps1 -vsVersion 14 -tsScript tsc\`
-
+restart or start visual studio. Under File->Open->Web Site... open the ngconf2015demo folder
 
 **update Sublime Text:**
 
