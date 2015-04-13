@@ -5,9 +5,15 @@ function addAnnotation(c: any, annotation: any): any {
     return c;
 }
 
-export function Component(arg: { selector: string, componentServices: any[] }, @paramtypes parameters?: any[]) {
+export function Component(arg?: { selector: string, componentServices: any[] }) {
     return (c) => {
-        c.parameters = parameters.map(p => [p]);
+        let paramTypes = Reflect.getMetadata("design:paramtypes", c);
+        if (paramTypes) {
+            c.parameters = paramTypes.map(p => [p]);
+        }
+        else {
+            c.parameters = [];
+        }
         addAnnotation(c, new ComponentAnnotation(arg))
         return
     }
