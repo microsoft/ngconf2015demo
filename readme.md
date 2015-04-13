@@ -23,13 +23,7 @@ restart or start visual studio. Under File->Open->Web Site... open the ngconf201
 
 **update Sublime Text:**
 
-copy sublime\typescript folder into the Sublime Text packages folder
+If you are using [Package Control](https://packagecontrol.io/) for Sublime Text, simply 
+install the `TypeScript` package.
 
-Sublime Text packages folder default location:
-
--	Windows Sublime 2: %APPDATA%\Sublime Text 2\Packages
--	Windows Sublime 3: %APPDATA%\Sublime Text 3\Packages
--	OS X: ~/Library/Application Support/Sublime Text 2
--	OS X: ~/Library/Application Support/Sublime Text 3
--	Linux: ~/.Sublime Text 2
--	Linux: ~/.Sublime Text 3
+Alternatively, you can clone the [repo](https://github.com/Microsoft/TypeScript-Sublime-Plugin) directly.
