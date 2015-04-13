@@ -1,8 +1,12 @@
 {
     "compilerOptions": {
-        "module":"AMD"
+        "module":"AMD",
+        "target": "ES5",
+        "emitDecoratorMetadata": true
     },
     "files": [
-        "todo.ts"
+        "todo.ts",
+        "tsc/lib.d.ts",
+        "deps/reflect.d.ts"
     ]
 }
