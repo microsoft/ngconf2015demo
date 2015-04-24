@@ -1,17 +1,16 @@
-import {Component, Template} from 'annotations';
-import {bootstrap, Foreach} from 'angular2/angular2';
+import {Component, View, bootstrap, For} from 'angular2/angular2';
 import {bind} from 'angular2/di';
 import {AngularFire, FirebaseArray} from 'firebase/angularfire';
 
 @Component({
   selector: 'todo-app',
-  componentServices: [
+  injectables: [
     AngularFire,
     bind(Firebase).toValue(new Firebase('https://webapi.firebaseio-demo.com/test'))
 ]})
-@Template({
-  url: '/todo.html',
-  directives: [Foreach]
+@View({
+  templateUrl: 'todo.html',
+  directives: [For]
 })
 class TodoApp {
   todoService: FirebaseArray;
@@ -73,7 +72,4 @@ class TodoApp {
   }
 
 }
-
-export function main() {
-  bootstrap(TodoApp);
-}
+bootstrap(TodoApp);

@@ -1,53 +1,37 @@
 <!doctype html>
 <html>
 <head>
-  <title>ng2do</title>
-  <style media="screen">
-  html,
-  body {
-    margin: 0;
-    padding: 0;
-  }
+    <title>ng2do</title>
+    <style media="screen">
+        html,
+        body {
+            margin: 0;
+            padding: 0;
+        }
 
-  body {
-    font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
-    line-height: 1.4em;
-    background: #eaeaea url('/deps/css/bg.png');
-    color: #4d4d4d;
-    width: 550px;
-    margin: 0 auto;
-    -webkit-font-smoothing: antialiased;
-    -moz-font-smoothing: antialiased;
-    -ms-font-smoothing: antialiased;
-    -o-font-smoothing: antialiased;
-    font-smoothing: antialiased;
-  }
-  </style>
+        body {
+            font: 14px 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.4em;
+            background: #eaeaea url('css/bg.png');
+            color: #4d4d4d;
+            width: 550px;
+            margin: 0 auto;
+            -webkit-font-smoothing: antialiased;
+            -moz-font-smoothing: antialiased;
+            -ms-font-smoothing: antialiased;
+            -o-font-smoothing: antialiased;
+            font-smoothing: antialiased;
+        }
+    </style>
+    <script src="https://github.jspm.io/jmcriffey/bower-traceur-runtime@0.0.87/traceur-runtime.js"></script>
+    <script src="https://jspm.io/system@0.16.js"></script>
+    <script src="/angular2/angular2-bundle.js"></script>
+    <script src="/firebase/firebase.js"></script>
 </head>
 <body>
-  <todo-app>Loading...</todo-app>
-
-  <!-- loading es6-module-loader.js shims promises, so it has to come before zone.js -->
-  <script src="/deps/traceur.js"></script>
-  <script src="/deps/system.js"></script>
-
-  <script src="/deps/zone.js"></script>
-  <script src="/deps/long-stack-trace-zone.js"></script>
-
-  <script src="/ng/rtts_assert/rtts_assert.js"></script>
-  <script src="/deps/firebase/firebase.js"></script>
-
-  <script>
-    System.paths = {
-      '*':'/ng/*.js',
-      'di':'angular2/di',
-      'annotations':'annotations.js',
-      'todo': 'todo.js',
-      'firebase/angularfire': 'deps/firebase/angularfire.js'
-    };
-    System.import('todo').then(function(module) {
-      module.main();
-    }, console.log.bind(console));
-  </script>
-  </body>
+    <todo-app>Loading...</todo-app>
+    <script>
+        System.import('todo');
+    </script>
+</body>
 </html>
