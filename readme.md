@@ -2,6 +2,7 @@
 ```
 npm install tsd
 tsd reinstall
+```
 
 **build:**
 ```
