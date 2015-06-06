@@ -13,7 +13,7 @@ npm install
  http-server -p 8080
  ```
 
-**install typings (required for design time typechecking in editors)
+**install typings (required for design time typechecking in editors)**
 ```
 npm install tsd -g
 tsd reinstall
