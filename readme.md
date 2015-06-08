@@ -1,14 +1,6 @@
 **install:**
 ```
-npm install tsd
-tsd reinstall
-tsd rebundle
-```
-
-**build:**
-```
-npm install -g typescript@1.5.0-beta
-tsc
+npm install
 ```
 
 **run:**
@@ -20,6 +12,14 @@ tsc
  ```
  http-server -p 8080
  ```
+
+**install typings (required for design time typechecking in editors)**
+```
+npm install tsd -g
+tsd reinstall
+tsd rebundle
+
+```
 
 **update Visual Studio:**
 

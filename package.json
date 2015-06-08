@@ -1,0 +1,9 @@
+{
+    "name": "ngconf2015-demo",
+    "version": "0.1.0",
+    "repository": { "url": "https://github.com/Microsoft/ngconf2015demo" },
+    "dependencies": {
+        "typescript": "mhegazy/typescript#v1.5-beta2",
+        "systemjs": "0.17.1"
+    }
+}
