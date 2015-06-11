@@ -3,6 +3,8 @@
 npm install
 ```
 
+> Note: This demo uses [SystemJS](https://github.com/systemjs/systemjs) and [es6-module-loader](https://github.com/ModuleLoader/es6-module-loader) to transpile typescript files in the browser. It also uses a pre-release drop of TypeScript 1.5.2 from [mhegazy/typescript#v1.5-beta2](https://github.com/mhegazy/typescript#v1.5-beta2)
+
 **run:**
 - install http-server package via
  ```
