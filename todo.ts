@@ -23,8 +23,11 @@ class TodoApp {
   }
   enterTodo($event, newTodo) {
     if($event.which === 13) { // ENTER_KEY
-      this.addTodo(newTodo.value);
-      newTodo.value = '';
+      var todoText = newTodo.value.trim();
+      if (todoText) {
+        this.addTodo(todoText);
+        newTodo.value = '';
+      }
     }
   }
   editTodo($event, todo) {
