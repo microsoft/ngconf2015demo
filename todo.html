@@ -21,7 +21,7 @@
       <li *ng-for="#todo of todoService.list">
 
         <div class="view"
-            [class.hidden]="todoEdit == todo">
+            [class.hidden]="(todoEdit == todo || todoFilter == todo.completed)">
 
           <input class="toggle" type="checkbox"
                  (click)="completeMe(todo)"
@@ -46,18 +46,19 @@
 
   </section>
 
+<!-- Add a (click) to Active and Completed to toggle display -->
   <footer id="footer">
     <span id="todo-count"></span>
     <div [class.hidden]="true"></div>
     <ul id="filters">
       <li>
-        <a href="#/" class="selected">All</a>
+        <a href="#/" (click)="showAll()">All</a>
       </li>
       <li>
-        <a href="#/active">Active</a>
+        <a href="#/active" (click)="showActive()">Active</a>
       </li>
       <li>
-        <a href="#/completed">Completed</a>
+        <a href="#/completed" (click)="showCompleted()">Completed</a>
       </li>
     </ul>
     <button id="clear-completed" (click)="clearCompleted()">Clear completed</button>
