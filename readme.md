@@ -25,12 +25,10 @@ tsd rebundle
 
 **update Visual Studio:**
 
-open a powershell command prompt in the ngconf2015demo folder and run one of the below commands/scripts
-- Visual Studio 2013 `vs\VSDevMode.ps1 -vsVersion 12 -tsScript tsc\`
-- Visual Studio 2015 CTP `vs\VSDevMode.ps1 -vsVersion 14 -tsScript tsc\`
-
-restart or start visual studio. Under File->Open->Web Site... open the ngconf2015demo folder
-
+Install TypeScript 1.5 or later releases:
+- [Download Visual Studio 2015](https://www.visualstudio.com/downloads/download-visual-studio-vs)
+- [Install TypeSript plugin for Visual Studio 2013](https://visualstudiogallery.msdn.microsoft.com/b1fff87e-d68b-4266-8bba-46fad76bbf22)
+ 
 **update Sublime Text:**
 
 If you are using [Package Control](https://packagecontrol.io/) for Sublime Text, simply 
