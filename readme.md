@@ -1,3 +1,5 @@
+> **NOTE**: This repo is no longer updated. Please refere to the Angular2 Quick Start guide at: https://angular.io/docs/ts/latest/quickstart.html for a Angular2 + TypeScript sample.
+
 **install:**
 ```
 npm install
