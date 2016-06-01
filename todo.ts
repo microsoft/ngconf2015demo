@@ -32,6 +32,10 @@ class TodoApp {
   }
   editTodo($event, todo) {
     this.todoEdit = todo;
+    //HACK: set focus to the editor
+    var listItem = $event.target.parentNode.parentNode;
+    var editInput = listItem.querySelector('.edit');
+    setTimeout(() => editInput.focus());
   }
   doneEditing($event, todo) {
     var which = $event.which;
